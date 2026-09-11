@@ -1,0 +1,67 @@
+workflows:
+  ios-release:
+    name: Edible iOS Release
+    max_build_duration: 120
+    instance_type: mac_mini_m2
+
+    integrations:
+      app_store_connect: edible-appstore
+
+    environment:
+      flutter: stable
+
+      groups:
+        - edible_ios
+
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.mndrs.edible
+
+    scripts:
+      - name: Get Flutter packages
+        script: |
+          set -e
+          flutter pub get
+
+      - name: Configure iOS Google Maps key
+        script: |
+          set -e
+
+          mkdir -p "$CM_BUILD_DIR/ios/Flutter"
+
+          cat > "$CM_BUILD_DIR/ios/Flutter/Secrets.xcconfig" <<EOF
+          GOOGLE_MAPS_API_KEY=$GOOGLE_MAPS_API_KEY
+          EOF
+
+          echo "Secrets.xcconfig created."
+
+      - name: Install CocoaPods dependencies
+        script: |
+          set -e
+          cd "$CM_BUILD_DIR/ios"
+          pod install --repo-update
+
+      - name: Set up iOS code signing
+        script: |
+          set -e
+          xcode-project use-profiles
+
+      - name: Build iOS IPA
+        script: |
+          set -e
+
+          flutter build ipa \
+            --release \
+            --dart-define=SUPABASE_URL="$SUPABASE_URL" \
+            --dart-define=SUPABASE_ANON_KEY="$SUPABASE_ANON_KEY" \
+            --export-options-plist=/Users/builder/export_options.plist
+
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcode_logs/*.log
+      - build/ios/archive/**/*.dSYM
+
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
