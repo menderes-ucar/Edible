@@ -4,9 +4,6 @@ workflows:
     max_build_duration: 120
     instance_type: mac_mini_m2
 
-    integrations:
-      app_store_connect: edible-appstore
-
     environment:
       flutter: stable
 
@@ -32,8 +29,6 @@ workflows:
           cat > "$CM_BUILD_DIR/ios/Flutter/Secrets.xcconfig" <<EOF
           GOOGLE_MAPS_API_KEY=$GOOGLE_MAPS_API_KEY
           EOF
-
-          echo "Secrets.xcconfig created."
 
       - name: Install CocoaPods dependencies
         script: |
@@ -63,5 +58,7 @@ workflows:
 
     publishing:
       app_store_connect:
-        auth: integration
+        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
+        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
         submit_to_testflight: true
