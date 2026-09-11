@@ -1,0 +1,40 @@
+{
+  "total_contents": 150,
+  "food_intelligence_records": 84,
+  "culture_guide_records": 36,
+  "cities": {
+    "Istanbul": {
+      "total": 50,
+      "categories": {
+        "place": 15,
+        "food": 12,
+        "snack": 6,
+        "culture": 7,
+        "drink": 5,
+        "fruit": 5
+      }
+    },
+    "Tokyo": {
+      "total": 50,
+      "categories": {
+        "place": 15,
+        "food": 12,
+        "snack": 6,
+        "culture": 7,
+        "drink": 5,
+        "fruit": 5
+      }
+    },
+    "Rome": {
+      "total": 50,
+      "categories": {
+        "place": 15,
+        "food": 12,
+        "snack": 6,
+        "culture": 7,
+        "drink": 5,
+        "fruit": 5
+      }
+    }
+  }
+}

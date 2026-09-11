@@ -1,0 +1,17 @@
+{
+  "referenced_ui_keys": 0,
+  "english_covered": 0,
+  "turkish_covered": 0,
+  "english_missing": [],
+  "turkish_missing": [],
+  "supported_locales_declared": [
+    "en",
+    "tr",
+    "de",
+    "fr",
+    "es",
+    "it",
+    "ar"
+  ],
+  "note": "DE/FR/ES/IT/AR still fall back to English for keys not yet translated; full translation coverage is the next localization pass."
+}

@@ -1,0 +1,7 @@
+{
+  "old_global_expansion_records": 354,
+  "unique_image_urls": 6,
+  "reused_image_urls": 6,
+  "max_single_image_reuse": 59,
+  "release_rule": "Do not attach category-generic stock photography to named POIs. New world flagship content uses only verified title-matched media; otherwise fallback UI."
+}

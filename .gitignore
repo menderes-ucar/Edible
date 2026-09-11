@@ -1,0 +1,71 @@
+# Flutter / Dart
+.dart_tool/
+.packages
+.pub/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Android local / signing
+*.jks
+*.keystore
+android/key.properties
+android/local.properties
+android/secrets.properties
+android/**/local.properties
+android/**/secrets.properties
+
+# Android generated
+android/**/build/
+android/**/.gradle/
+
+# iOS generated
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/ephemeral/
+ios/Flutter/Generated.xcconfig
+ios/Flutter/flutter_export_environment.sh
+ios/**/Pods/
+ios/**/.symlinks/
+
+# Xcode user / generated
+**/DerivedData/
+**/*.xcuserstate
+**/xcuserdata/
+
+# iOS signing / private credentials
+*.p12
+*.mobileprovision
+*.pem
+*.key
+
+# Firebase private credentials
+service-account*.json
+firebase-service-account*.json
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+
+# Logs
+*.log
+
+# Local Supabase CLI state
+supabase/.temp/
+
+# Project backup archives
+*.zip
+
+# Backup source files
+*.bak
+# Duplicate nested platform projects
+android/android/
+ios/ios/
+

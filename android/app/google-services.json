@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "646290728344",
+    "project_id": "edible-2668e",
+    "storage_bucket": "edible-2668e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:646290728344:android:25158d4da82ac5ffa0b7ed",
+        "android_client_info": {
+          "package_name": "com.mndrs.edible"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDNxmooYMtb1l3hq1MAGDj6wxLDlWWjo6Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

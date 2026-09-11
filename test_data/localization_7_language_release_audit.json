@@ -1,0 +1,40 @@
+{
+  "release_override_keys_per_locale": 175,
+  "locales": {
+    "en": {
+      "covered": 175,
+      "total": 175,
+      "missing": []
+    },
+    "tr": {
+      "covered": 175,
+      "total": 175,
+      "missing": []
+    },
+    "de": {
+      "covered": 175,
+      "total": 175,
+      "missing": []
+    },
+    "fr": {
+      "covered": 175,
+      "total": 175,
+      "missing": []
+    },
+    "es": {
+      "covered": 175,
+      "total": 175,
+      "missing": []
+    },
+    "it": {
+      "covered": 175,
+      "total": 175,
+      "missing": []
+    },
+    "ar": {
+      "covered": 175,
+      "total": 175,
+      "missing": []
+    }
+  }
+}

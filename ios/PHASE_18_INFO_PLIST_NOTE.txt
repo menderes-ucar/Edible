@@ -1,0 +1,6 @@
+For iOS photo-library access, add this key inside ios/Runner/Info.plist:
+
+<key>NSPhotoLibraryUsageDescription</key>
+<string>Edible uses your photo library so you can add photos to your private travel memories.</string>
+
+Phase 18 only opens the gallery. Camera access is not requested.

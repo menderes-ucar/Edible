@@ -1,0 +1,28 @@
+{
+  "launch_countries": 20,
+  "launch_cities_total": 80,
+  "existing_rich_cities": [
+    "Istanbul",
+    "Tokyo",
+    "Rome"
+  ],
+  "new_cities": 77,
+  "new_content_items": 616,
+  "categories": {
+    "place": 231,
+    "food": 154,
+    "culture": 77,
+    "drink": 77,
+    "snack": 77
+  },
+  "content_locales": [
+    "en",
+    "tr",
+    "de",
+    "fr",
+    "es",
+    "it",
+    "ar"
+  ],
+  "note": "New catalog marker coordinates are city-area editorial approximations and require place-level QA before store release."
+}

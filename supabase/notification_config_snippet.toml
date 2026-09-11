@@ -1,0 +1,8 @@
+# Merge these blocks into your existing supabase/config.toml.
+# Do not replace the existing file; keep your current function settings.
+
+[functions.send-message-notification]
+verify_jwt = false
+
+[functions.send-daily-discovery]
+verify_jwt = false

@@ -1,0 +1,6 @@
+Add this permission directly under the <manifest ...> tag in:
+android/app/src/main/AndroidManifest.xml
+
+<uses-permission android:name="com.android.vending.BILLING" />
+
+RevenueCat's Android purchase flow requires the Google Play BILLING permission.

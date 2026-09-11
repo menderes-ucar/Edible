@@ -1,0 +1,5 @@
+# Merge this under your existing `flutter:` section in pubspec.yaml.
+# Do NOT create a second `flutter:` key.
+flutter:
+  assets:
+    - assets/explore_images/

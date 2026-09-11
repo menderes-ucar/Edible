@@ -1,0 +1,12 @@
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/edible_icon.png"
+  min_sdk_android: 21
+  remove_alpha_ios: true
+
+  # Android Adaptive Icon
+  # The launcher supplies the final circle/squircle mask.
+  adaptive_icon_background: "#0B1C2A"
+  adaptive_icon_foreground: "assets/images/edible_icon_adaptive_foreground.png"
+  adaptive_icon_foreground_inset: 0

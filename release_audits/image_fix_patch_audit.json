@@ -1,0 +1,13 @@
+{
+  "patch_version": "2026-09-08-image-fix-01",
+  "catalog_local_manifest_entries": 2753,
+  "physical_explore_images": 5,
+  "physical_assets": [
+    "33d3af9b2246a736.jpg",
+    "5aa8c8cd342908cd.jpg",
+    "6d256bdfa3271f4b.jpg",
+    "701c79ac4a89e04f.jpg",
+    "d7bbce595117c46e.jpg"
+  ],
+  "note": "This patch fixes the asset-bundling/runtime path and includes the five real image assets already available in the workspace. It does not fabricate the remaining catalog images."
+}

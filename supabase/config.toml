@@ -1,0 +1,2 @@
+[functions.resolve-content-image]
+verify_jwt = false
