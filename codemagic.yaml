@@ -48,9 +48,7 @@ workflows:
         script: |
           set -e
 
-          BUILD_NUMBER=$(
-            $(app-store-connect get-latest-app-store-build-number "$APP_STORE_APPLE_ID") + 1
-          )
+          BUILD_NUMBER=$(($(app-store-connect get-latest-app-store-build-number "$APP_STORE_APPLE_ID") + 1))
 
           echo "========================================"
           echo "Edible iOS Release"
