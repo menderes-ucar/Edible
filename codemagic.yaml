@@ -10,6 +10,9 @@ workflows:
       groups:
         - edible_ios
 
+      vars:
+        APP_STORE_APPLE_ID: "6811003746"
+
       ios_signing:
         distribution_type: app_store
         bundle_identifier: com.mndrs.edible
@@ -45,8 +48,20 @@ workflows:
         script: |
           set -e
 
+          BUILD_NUMBER=$(
+            $(app-store-connect get-latest-app-store-build-number "$APP_STORE_APPLE_ID") + 1
+          )
+
+          echo "========================================"
+          echo "Edible iOS Release"
+          echo "Version: 1.0.1"
+          echo "Build:   $BUILD_NUMBER"
+          echo "========================================"
+
           flutter build ipa \
             --release \
+            --build-name=1.0.1 \
+            --build-number="$BUILD_NUMBER" \
             --dart-define=SUPABASE_URL="$SUPABASE_URL" \
             --dart-define=SUPABASE_ANON_KEY="$SUPABASE_ANON_KEY" \
             --export-options-plist=/Users/builder/export_options.plist
