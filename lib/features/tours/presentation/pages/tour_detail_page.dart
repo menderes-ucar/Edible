@@ -185,9 +185,9 @@ class _TourDetailPageState extends State<TourDetailPage> {
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 18, 16, 0),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(package.title, style: const TextStyle(color: Colors.white, fontSize: 25, height: 1.1, fontWeight: FontWeight.w900)),
+                Text(package.title, style: const TextStyle(color: AppColors.textBrightBlack, fontSize: 25, height: 1.1, fontWeight: FontWeight.w900)),
                 const SizedBox(height: 9),
-                Text(package.summary, style: const TextStyle(color: Colors.white70, fontSize: 14, height: 1.45)),
+                Text(package.summary, style: const TextStyle(color: AppColors.textBrightBlack, fontSize: 14, height: 1.45)),
                 const SizedBox(height: 16),
                 Wrap(spacing: 8, runSpacing: 8, children: [
                   _MetaChip(icon: Icons.calendar_month_rounded, label: '${package.days} ${context.l10n.text('days')}'),
@@ -298,8 +298,8 @@ class _StopCard extends StatelessWidget {
   Widget build(BuildContext context) => Card(clipBehavior: Clip.antiAlias, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
     AspectRatio(aspectRatio: 16 / 8, child: SmartContentImage(title: stop.title, locale: Localizations.localeOf(context).languageCode, city: package.cityName, country: package.countryName, preferredUrl: stop.imageUrl, fit: BoxFit.cover, showAttribution: false)),
     Padding(padding: const EdgeInsets.fromLTRB(13, 12, 13, 13), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Row(children: [Expanded(child: Text(stop.title, style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w900, fontSize: 17))), if (completed) const Icon(Icons.check_circle_rounded, color: AppColors.success)]),
-      const SizedBox(height: 5), Text(stop.subtitle, style: const TextStyle(color: AppColors.textMuted, height: 1.35)),
+      Row(children: [Expanded(child: Text(stop.title, style: const TextStyle(color: AppColors.textBrightBlack, fontWeight: FontWeight.w900, fontSize: 17))), if (completed) const Icon(Icons.check_circle_rounded, color: AppColors.success)]),
+      const SizedBox(height: 5), Text(stop.subtitle, style: const TextStyle(color: AppColors.textBrightBlack, height: 1.35)),
       const SizedBox(height: 11),
       Align(alignment: Alignment.centerRight, child: FilledButton.tonalIcon(onPressed: onCompleted, icon: Icon(completed ? Icons.star_rounded : Icons.check_rounded), label: Text(completed && rating != null ? '$rating/5' : context.l10n.text('visitedAndRate')))),
     ])),

@@ -295,11 +295,11 @@ class _TourPackageCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('${package.cityName} · ${package.days} ${context.l10n.text('days')}',
-                      style: Theme.of(context).textTheme.labelLarge),
+                      style: const TextStyle(color: AppColors.textBrightBlack, fontWeight: FontWeight.w800)),
                   const SizedBox(height: 5),
-                  Text(package.title, style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900)),
+                  Text(package.title, style: const TextStyle(color: AppColors.textBrightBlack, fontSize: 20, fontWeight: FontWeight.w900)),
                   const SizedBox(height: 6),
-                  Text(package.summary),
+                  Text(package.summary, style: const TextStyle(color: AppColors.textBrightBlack, height: 1.4)),
                   const SizedBox(height: 10),
                   Row(children: [
                     Expanded(child: Wrap(spacing: 12, children: [
@@ -314,7 +314,7 @@ class _TourPackageCard extends StatelessWidget {
                     ),
                   ]),
                   const SizedBox(height: 8),
-                  Text(package.coverAttribution, style: Theme.of(context).textTheme.labelSmall),
+                  Text(package.coverAttribution, style: const TextStyle(color: AppColors.textBrightBlack, fontSize: 11)),
                 ],
               ),
             ),
@@ -330,6 +330,6 @@ class _Stat extends StatelessWidget {
   final IconData icon; final String text;
   @override
   Widget build(BuildContext context) => Row(mainAxisSize: MainAxisSize.min, children: [
-    Icon(icon,size:16), const SizedBox(width:4), Text(text,style:const TextStyle(fontWeight:FontWeight.w800)),
+    Icon(icon,size:16), const SizedBox(width:4), Text(text,style:const TextStyle(color: AppColors.textBrightBlack, fontWeight:FontWeight.w800)),
   ]);
 }

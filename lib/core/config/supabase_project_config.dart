@@ -2,16 +2,10 @@ class SupabaseProjectConfig {
   SupabaseProjectConfig._();
 
   /// Public Supabase project URL. Safe to ship in a client application.
-  ///
-  /// The anon / publishable key is intentionally NOT stored in source code.
-  /// Provide it at build time with --dart-define=SUPABASE_ANON_KEY=...
   static const String url = 'https://lylliolgjxmbpawkriww.supabase.co';
 
-  /// Kept empty intentionally so credentials are supplied at build time.
-  ///
-  /// IMPORTANT:
-  /// - Never put the Supabase service_role key in the mobile app.
-  /// - The anon / publishable key is a client-side key and is not a server secret.
-  /// - Real data security must be enforced by Supabase RLS policies.
-  static const String anonKey = '';
+  /// Supabase anon / publishable key used by the client application.
+  /// This is a client-side key, not the service_role key.
+  /// Keep RLS policies enabled for real data protection.
+  static const String anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx5bGxpb2xnanhtYnBhd2tyaXd3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDE4MDIsImV4cCI6MjEwMzkxNzgwMn0.CpLmNLfgC6M6ntbFyQmRL2LiyekE14R40_gboIBCe4Y';
 }

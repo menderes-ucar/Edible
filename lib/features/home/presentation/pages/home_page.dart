@@ -537,9 +537,9 @@ class _CityCard extends StatelessWidget {
               Expanded(child: InkWell(
                 onTap: onTap,
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(city.cityName, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w900)),
+                  Text(city.cityName, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w900, color: AppColors.textBrightBlack)),
                   const SizedBox(height: 2),
-                  Text('${city.countryName} · ${items.length} keşif', style: theme.textTheme.bodySmall),
+                  Text('${city.countryName} · ${items.length} keşif', style: theme.textTheme.bodySmall?.copyWith(color: AppColors.textBrightBlack)),
                 ]),
               )),
               IconButton(
@@ -642,13 +642,13 @@ class _MiniContentCard extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(9, 7, 9, 8),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(content.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 12)),
+              Text(content.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: AppColors.textBrightBlack, fontWeight: FontWeight.w800, fontSize: 12)),
               const SizedBox(height: 2),
               Text(
                 (content.shortDescription.trim().isNotEmpty ? content.shortDescription : content.description),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 10.5),
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 10.5, color: AppColors.textBrightBlack),
               ),
             ]),
           ),

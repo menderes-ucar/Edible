@@ -25,9 +25,9 @@
 	<key>GMSApiKey</key>
 	<string>$(GOOGLE_MAPS_API_KEY)</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Edible, yakındaki mekanları göstermek ve harita üzerinde mevcut konumunuzu belirlemek için konumunuzu kullanır.</string>
+	<string>Edible, harita ve konum tabanlı seyahat özelliklerini sunmak için konumunuzu kullanır.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Edible, konum tabanlı özellikleri ve harita hizmetlerini sağlamak için konumunuzu kullanır.</string>
+	<string>Edible, konum tabanlı özelliklerin çalışabilmesi için konumunuza erişim kullanabilir.</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>

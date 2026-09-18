@@ -32,6 +32,9 @@ class NotificationService {
   static const String _channelName = 'Edible bildirimleri';
   static const String _channelDescription =
       'Edible mesaj, keşif ve seyahat bildirimleri';
+  static const String _messageChannelId = 'edible_messages';
+  static const String _socialChannelId = 'edible_social';
+  static const String _travelChannelId = 'edible_travel';
   static const int _dailyNotificationId = 47001;
 
   FirebaseMessaging get _messaging => FirebaseMessaging.instance;
@@ -187,18 +190,48 @@ class NotificationService {
       onDidReceiveNotificationResponse: _handleLocalNotificationTap,
     );
 
-    const channel = AndroidNotificationChannel(
-      _channelId,
-      _channelName,
-      description: _channelDescription,
-      importance: Importance.high,
-      playSound: true,
-      enableVibration: true,
-    );
-
     final androidPlugin = _local.resolvePlatformSpecificImplementation<
         AndroidFlutterLocalNotificationsPlugin>();
-    await androidPlugin?.createNotificationChannel(channel);
+
+    await androidPlugin?.createNotificationChannel(
+      const AndroidNotificationChannel(
+        _channelId,
+        _channelName,
+        description: _channelDescription,
+        importance: Importance.high,
+        playSound: true,
+        enableVibration: true,
+      ),
+    );
+    await androidPlugin?.createNotificationChannel(
+      const AndroidNotificationChannel(
+        _messageChannelId,
+        'Mesajlar',
+        description: 'Yeni mesaj bildirimleri',
+        importance: Importance.high,
+        playSound: true,
+        enableVibration: true,
+      ),
+    );
+    await androidPlugin?.createNotificationChannel(
+      const AndroidNotificationChannel(
+        _socialChannelId,
+        'Sosyal bildirimler',
+        description: 'Topluluk ve sosyal etkileşim bildirimleri',
+        importance: Importance.high,
+        playSound: true,
+        enableVibration: true,
+      ),
+    );
+    await androidPlugin?.createNotificationChannel(
+      const AndroidNotificationChannel(
+        _travelChannelId,
+        'Seyahat bildirimleri',
+        description: 'Gezi, keşif ve seyahat hatırlatıcıları',
+        importance: Importance.defaultImportance,
+        playSound: true,
+      ),
+    );
 
     _localReady = true;
   }
@@ -324,6 +357,7 @@ class NotificationService {
       title: title,
       body: body,
       payload: jsonEncode(message.data),
+      type: message.data['type']?.toString(),
     );
   }
 
@@ -359,15 +393,27 @@ class NotificationService {
     required String title,
     required String body,
     String? payload,
+    String? type,
   }) async {
     if (!_localReady) return;
 
-    const android = AndroidNotificationDetails(
-      _channelId,
-      _channelName,
-      channelDescription: _channelDescription,
-      importance: Importance.high,
-      priority: Priority.high,
+    final channel = switch (type) {
+      'message' || 'messages' => (id: _messageChannelId, name: 'Mesajlar', description: 'Yeni mesaj bildirimleri'),
+      'social' || 'community' => (id: _socialChannelId, name: 'Sosyal bildirimler', description: 'Topluluk ve sosyal etkileşim bildirimleri'),
+      'trip' || 'travel' || 'discovery' => (id: _travelChannelId, name: 'Seyahat bildirimleri', description: 'Gezi, keşif ve seyahat hatırlatıcıları'),
+      _ => (id: _channelId, name: _channelName, description: _channelDescription),
+    };
+
+    final android = AndroidNotificationDetails(
+      channel.id,
+      channel.name,
+      channelDescription: channel.description,
+      importance: type == 'discovery' || type == 'travel'
+          ? Importance.defaultImportance
+          : Importance.high,
+      priority: type == 'discovery' || type == 'travel'
+          ? Priority.defaultPriority
+          : Priority.high,
       playSound: true,
       enableVibration: true,
     );
@@ -381,7 +427,7 @@ class NotificationService {
       DateTime.now().millisecondsSinceEpoch.remainder(2147483647),
       title,
       body,
-      const NotificationDetails(android: android, iOS: ios),
+       NotificationDetails(android: android, iOS: ios),
       payload: payload,
     );
   }

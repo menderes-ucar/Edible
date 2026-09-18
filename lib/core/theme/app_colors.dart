@@ -46,6 +46,8 @@ abstract final class AppColors {
   static const Color mediumGray = border;
   static const Color gray = Color(0xFFA7C4C0);
   static const Color darkGray = Color(0xFF476A67);
+  static const Color textBrightBlack = Color(0xFF111111);
+  static const Color textSoftWhite = Color(0xFFE6E6E6);
   static const Color textDark = textPrimary;
   static const Color backgroundWhite = surfaceMint;
   static const Color backgroundLight = surface;
