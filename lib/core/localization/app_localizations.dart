@@ -5,6 +5,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'release_localization_overrides.dart';
 import 'app_language.dart';
 import 'extended_localization_overrides.dart';
+import 'hardcoded_ui_localization_overrides.dart';
 
 class AppLocalizations {
   AppLocalizations(this.locale);
@@ -703,11 +704,13 @@ class AppLocalizations {
   String text(String key) {
     final languageCode = locale.languageCode;
     final language = _values[languageCode];
+    final hardcoded = hardcodedUiLocalizationOverrides[languageCode];
     final extended = extendedLocalizationOverrides[languageCode];
     final overrides = releaseLocalizationOverrides[languageCode];
     final englishOverrides = releaseLocalizationOverrides['en'];
 
-    return extended?[key] ??
+    return hardcoded?[key] ??
+        extended?[key] ??
         overrides?[key] ??
         language?[key] ??
         englishOverrides?[key] ??
@@ -719,7 +722,8 @@ class AppLocalizations {
     required String languageCode,
     required String key,
   }) {
-    return extendedLocalizationOverrides[languageCode]?.containsKey(key) == true ||
+    return hardcodedUiLocalizationOverrides[languageCode]?.containsKey(key) == true ||
+        extendedLocalizationOverrides[languageCode]?.containsKey(key) == true ||
         releaseLocalizationOverrides[languageCode]?.containsKey(key) == true ||
         _values[languageCode]?.containsKey(key) == true;
   }

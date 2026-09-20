@@ -170,8 +170,20 @@ class _HomeView extends StatelessWidget {
       final key = '${item.countryCode.trim().toUpperCase()}|${_normalizeCity(item.cityName)}';
       (cities[key] ??= []).add(item);
     }
+    final cityPriority = <String, int>{
+      'istanbul': 0,
+      'bursa': 1,
+      'antalya': 2,
+      'ankara': 3,
+      'izmir': 4,
+    };
     final cityGroups = cities.values.toList()
       ..sort((a, b) {
+        final aCity = _normalizeCity(a.first.cityName);
+        final bCity = _normalizeCity(b.first.cityName);
+        final aPriority = cityPriority[aCity] ?? 1000;
+        final bPriority = cityPriority[bCity] ?? 1000;
+        if (aPriority != bPriority) return aPriority.compareTo(bPriority);
         final countryCompare = a.first.countryName.toLowerCase().compareTo(b.first.countryName.toLowerCase());
         if (countryCompare != 0) return countryCompare;
         return a.first.cityName.toLowerCase().compareTo(b.first.cityName.toLowerCase());
@@ -334,7 +346,7 @@ class _HomeHeader extends StatelessWidget {
                   ),
                   const SizedBox(height: 5),
                   Text(
-                    'Yeni yerler.\nYeni tatlar.',
+                    context.l10n.text('homeHero'),
                     style: theme.textTheme.headlineSmall?.copyWith(
                       color: AppColors.primaryDark,
                       fontWeight: FontWeight.w900,
@@ -344,7 +356,7 @@ class _HomeHeader extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    'Bugün ne keşfedeceksin?',
+                    context.l10n.text('discover'),
                     style: TextStyle(color: AppColors.primaryDark.withValues(alpha: .72), fontSize: 10, fontWeight: FontWeight.w600),
                   ),
                 ],
@@ -441,19 +453,19 @@ class _CategoryRail extends StatelessWidget {
         itemBuilder: (_, i) {
           if (i == 0) return FilterChip(label: Text(context.l10n.text('all')), selected: selected == null, onSelected: (_) => onClear());
           final category = values[i - 1];
-          return FilterChip(label: Text(_categoryName(category)), selected: selected == category, onSelected: (_) => onSelected(category));
+          return FilterChip(label: Text(_categoryName(context, category)), selected: selected == category, onSelected: (_) => onSelected(category));
         },
       ),
     );
   }
 
-  String _categoryName(ExploreCategory c) => switch (c) {
-    ExploreCategory.place => 'Mekân',
-    ExploreCategory.food => 'Yemek',
-    ExploreCategory.snack => 'Atıştırmalık',
-    ExploreCategory.culture => 'Kültür',
-    ExploreCategory.fruit => 'Meyve',
-    ExploreCategory.drink => 'İçecek',
+  String _categoryName(BuildContext context, ExploreCategory c) => switch (c) {
+    ExploreCategory.place => context.l10n.text('places'),
+    ExploreCategory.food => context.l10n.text('food'),
+    ExploreCategory.snack => context.l10n.text('snacks'),
+    ExploreCategory.culture => context.l10n.text('culture'),
+    ExploreCategory.fruit => context.l10n.text('fruit'),
+    ExploreCategory.drink => context.l10n.text('drinks'),
   };
 }
 
@@ -476,7 +488,7 @@ class _SectionHeader extends StatelessWidget {
             border: Border.all(color: AppColors.primary.withValues(alpha: .16)),
           ),
           child: Icon(
-            title == 'Şehirler' ? Icons.location_city_rounded : Icons.explore_rounded,
+            title == context.l10n.text('cities') ? Icons.location_city_rounded : Icons.explore_rounded,
             color: AppColors.primaryDark,
             size: 21,
           ),
@@ -490,14 +502,14 @@ class _SectionHeader extends StatelessWidget {
                 title,
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.w900,
-                  color: Colors.white,
+                  color: AppColors.textBrightBlack,
                 ),
               ),
               const SizedBox(height: 2),
               Text(
                 subtitle,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Colors.white70,
+                  color: AppColors.textMuted,
                 ),
               ),
             ],
@@ -539,7 +551,7 @@ class _CityCard extends StatelessWidget {
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text(city.cityName, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w900, color: AppColors.textBrightBlack)),
                   const SizedBox(height: 2),
-                  Text('${city.countryName} · ${items.length} keşif', style: theme.textTheme.bodySmall?.copyWith(color: AppColors.textBrightBlack)),
+                  Text('${city.countryName} · ${context.l10n.text('discoveryCount').replaceAll('{count}', items.length.toString())}', style: theme.textTheme.bodySmall?.copyWith(color: AppColors.textBrightBlack)),
                 ]),
               )),
               IconButton(
@@ -669,9 +681,9 @@ class _FavoritesSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const _SectionHeader(
-          title: 'Favorilerin',
-          subtitle: 'Kaydettiğin keşiflere hızlıca dön.',
+        _SectionHeader(
+          title: context.l10n.text('homeFavorites'),
+          subtitle: context.l10n.text('homeFavoritesSubtitle'),
         ),
         SizedBox(
           height: 286,

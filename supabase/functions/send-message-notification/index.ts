@@ -111,6 +111,16 @@ Deno.serve(async (request) => {
       .eq('conversation_id', conversationId);
     if (participantsError) throw participantsError;
 
+    const isParticipant = (participants ?? []).some(
+      (item) => item.user_id === authData.user.id,
+    );
+    if (!isParticipant) {
+      return new Response(JSON.stringify({ error: 'Forbidden' }), {
+        status: 403,
+        headers: { ...corsHeaders, 'content-type': 'application/json' },
+      });
+    }
+
     const recipient = (participants ?? []).find(
       (item) => item.user_id !== authData.user.id,
     );

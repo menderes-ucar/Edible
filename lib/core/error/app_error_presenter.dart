@@ -40,6 +40,18 @@ class AppErrorPresenter {
       return context.l10n.text('emailAlreadyRegistered');
     }
 
+    if (normalized.contains('authentication_required')) {
+      return context.l10n.text('authenticationRequired');
+    }
+    if (normalized.contains('content_not_synced_to_supabase')) {
+      return context.l10n.text('favoriteCatalogSyncRequired');
+    }
+    if (normalized.contains('favorite_persistence_failed') ||
+        normalized.contains('favoriteupdatefailed') ||
+        normalized.contains('favorite update failed')) {
+      return context.l10n.text('favoriteUpdateFailed');
+    }
+
     if (normalized.contains('saved_trip_operation_in_progress')) {
       return context.l10n.text('tripOperationInProgress');
     }

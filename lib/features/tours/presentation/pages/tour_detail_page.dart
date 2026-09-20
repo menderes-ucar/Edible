@@ -10,6 +10,7 @@ import '../../../explore/presentation/widgets/smart_content_image.dart';
 import '../../data/datasources/tour_local_data_source.dart';
 import '../../data/datasources/tour_remote_data_source.dart';
 import '../../data/repositories/tour_repository.dart';
+import '../../data/services/tour_localization.dart';
 import '../../domain/entities/tour_package.dart';
 
 class TourDetailPage extends StatefulWidget {
@@ -156,8 +157,13 @@ class _TourDetailPageState extends State<TourDetailPage> {
       );
     }
 
+    final localizedPackage = localizeTourPackage(
+      package,
+      Localizations.localeOf(context).languageCode,
+    );
+
     final byDay = <int, List<TourStop>>{};
-    for (final stop in package.stops) {
+    for (final stop in localizedPackage.stops) {
       byDay.putIfAbsent(stop.dayIndex, () => <TourStop>[]).add(stop);
     }
 
@@ -166,7 +172,7 @@ class _TourDetailPageState extends State<TourDetailPage> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF2D2D2D),
         foregroundColor: Colors.white,
-        title: Text(package.cityName, style: const TextStyle(fontWeight: FontWeight.w900)),
+        title: Text(localizedPackage.cityName, style: const TextStyle(fontWeight: FontWeight.w900)),
         actions: [
           IconButton(
             tooltip: context.l10n.text('favorite'),
@@ -181,21 +187,21 @@ class _TourDetailPageState extends State<TourDetailPage> {
         child: ListView(
           padding: const EdgeInsets.only(bottom: 36),
           children: [
-            _TourHero(package: package),
+            _TourHero(package: localizedPackage),
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 18, 16, 0),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(package.title, style: const TextStyle(color: AppColors.textBrightBlack, fontSize: 25, height: 1.1, fontWeight: FontWeight.w900)),
+                Text(localizedPackage.title, style: const TextStyle(color: AppColors.textBrightBlack, fontSize: 25, height: 1.1, fontWeight: FontWeight.w900)),
                 const SizedBox(height: 9),
-                Text(package.summary, style: const TextStyle(color: AppColors.textBrightBlack, fontSize: 14, height: 1.45)),
+                Text(localizedPackage.summary, style: const TextStyle(color: AppColors.textBrightBlack, fontSize: 14, height: 1.45)),
                 const SizedBox(height: 16),
                 Wrap(spacing: 8, runSpacing: 8, children: [
-                  _MetaChip(icon: Icons.calendar_month_rounded, label: '${package.days} ${context.l10n.text('days')}'),
-                  _MetaChip(icon: Icons.route_rounded, label: '${package.stops.length} ${context.l10n.text('stops')}'),
+                  _MetaChip(icon: Icons.calendar_month_rounded, label: '${localizedPackage.days} ${context.l10n.text('days')}'),
+                  _MetaChip(icon: Icons.route_rounded, label: '${localizedPackage.stops.length} ${context.l10n.text('stops')}'),
                   _MetaChip(icon: Icons.star_rounded, label: package.ratingCount == 0 ? '—' : package.ratingAverage.toStringAsFixed(1)),
                 ]),
                 const SizedBox(height: 18),
-                _ProgressCard(package: package, state: _userState),
+                _ProgressCard(package: localizedPackage, state: _userState),
                 const SizedBox(height: 14),
                 Row(children: [
                   Expanded(
@@ -229,7 +235,7 @@ class _TourDetailPageState extends State<TourDetailPage> {
                   _DayHeader(day: entry.key + 1, count: entry.value.length),
                   const SizedBox(height: 10),
                   for (final stop in entry.value) ...[
-                    _StopCard(package: package, stop: stop, completed: _userState.completedStopIds.contains(stop.id), rating: _userState.stopRatings[stop.id], onCompleted: () => _completeStop(stop)),
+                    _StopCard(package: localizedPackage, stop: stop, completed: _userState.completedStopIds.contains(stop.id), rating: _userState.stopRatings[stop.id], onCompleted: () => _completeStop(stop)),
                     const SizedBox(height: 12),
                   ],
                   const SizedBox(height: 6),

@@ -42,6 +42,7 @@ import 'features/food/data/repositories/food_repository_impl.dart';
 import 'features/food/domain/repositories/food_repository.dart';
 import 'features/food/presentation/providers/food_filter_provider.dart';
 import 'features/location/domain/usecases/find_nearby_discoveries.dart';
+import 'features/notifications/data/notification_service.dart';
 import 'features/location/presentation/providers/location_provider.dart';
 import 'features/location/presentation/providers/nearby_provider.dart';
 import 'features/offline/data/datasources/offline_city_pack_local_data_source.dart';
@@ -361,9 +362,19 @@ class _AppViewState extends State<_AppView> {
     super.dispose();
   }
 
+  String? _lastNotificationLanguage;
+
   @override
   Widget build(BuildContext context) {
     final locale = context.watch<LocaleProvider>().locale;
+    if (_lastNotificationLanguage != locale.languageCode) {
+      _lastNotificationLanguage = locale.languageCode;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          NotificationService.instance.updateLanguage(locale.languageCode);
+        }
+      });
+    }
 
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,

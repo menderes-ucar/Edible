@@ -45,20 +45,6 @@ class FavoriteRemoteDataSource {
       throw const FavoritePersistenceException('authentication_required');
     }
 
-    // Favorites references public.contents(id). The app also has a bundled
-    // catalog fallback, so verify the canonical DB row exists before insert.
-    final canonical = await client
-        .from('contents')
-        .select('id')
-        .eq('id', contentId)
-        .maybeSingle();
-
-    if (canonical == null) {
-      throw const FavoritePersistenceException(
-        'content_not_synced_to_supabase',
-      );
-    }
-
     await client.from('favorites').upsert(
       {
         'user_id': user.id,

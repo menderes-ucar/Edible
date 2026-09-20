@@ -481,11 +481,32 @@ class NotificationService {
   }
 
   Future<void> _scheduleDailyDiscoveryFromLocale() async {
-    // The exact language is refreshed by the app when the user changes locale.
-    // Turkish is the default launch language for the local reminder.
     await scheduleDailyDiscovery(
       languageCode: WidgetsBinding.instance.platformDispatcher.locale.languageCode,
     );
+  }
+
+  /// Keeps notification content aligned with the app-selected language.
+  /// The previous implementation used the device locale, so changing Edible's
+  /// language left the daily reminder and token language in the old language.
+  Future<void> updateLanguage(String languageCode) async {
+    final normalized = languageCode.trim().toLowerCase().split(RegExp(r'[-_]')).first;
+    if (normalized.isEmpty) return;
+
+    final client = SupabaseService.client;
+    final userId = _userId;
+    if (client != null && userId != null) {
+      try {
+        await client
+            .from('device_push_tokens')
+            .update({'language_code': normalized, 'last_seen_at': DateTime.now().toUtc().toIso8601String()})
+            .eq('user_id', userId);
+      } catch (error) {
+        debugPrint('[NOTIFICATIONS] Language sync failed: $error');
+      }
+    }
+
+    await scheduleDailyDiscovery(languageCode: normalized);
   }
 
   (String, String) _dailyCopy(String languageCode) {

@@ -5,6 +5,7 @@ import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../data/repositories/tour_repository.dart';
+import '../../data/services/tour_localization.dart';
 import '../../domain/entities/tour_package.dart';
 import '../widgets/tour_filter_sheet.dart';
 import '../../../explore/presentation/widgets/smart_content_image.dart';
@@ -240,7 +241,7 @@ class _ToursPageState extends State<ToursPage> {
             const SizedBox(height: 14),
             for (final package in visible) ...[
               _TourPackageCard(
-                package: package,
+                package: localizeTourPackage(package, Localizations.localeOf(context).languageCode),
                 onTap: () => context.pushNamed(
                   'tour-detail',
                   pathParameters: {'packageId': package.id},

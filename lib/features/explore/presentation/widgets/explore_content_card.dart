@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../../core/error/app_error_presenter.dart';
 import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../domain/entities/explore_content.dart';
@@ -97,7 +98,23 @@ class ExploreContentCard extends StatelessWidget {
                                 visualDensity: VisualDensity.compact,
                                 color: Colors.white,
                                 tooltip: selected ? context.l10n.text('favoriteRemove') : context.l10n.text('favoriteAdd'),
-                                onPressed: favorites.isPending(content.id) ? null : () => favorites.toggle(content),
+                                onPressed: favorites.isPending(content.id)
+                                    ? null
+                                    : () async {
+                                        final ok = await favorites.toggle(content);
+                                        if (!ok && context.mounted) {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                AppErrorPresenter.message(
+                                                  context,
+                                                  favorites.errorMessage,
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                      },
                                 icon: Icon(selected ? Icons.favorite_rounded : Icons.favorite_border_rounded, size: 19),
                               ),
                             );

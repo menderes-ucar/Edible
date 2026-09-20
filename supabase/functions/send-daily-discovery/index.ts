@@ -57,9 +57,9 @@ Deno.serve(async (request) => {
   }
 
   try {
-    const secret = Deno.env.get('DAILY_NOTIFICATION_CRON_SECRET');
-    const supplied = request.headers.get('x-edible-cron-secret');
-    if (secret && supplied !== secret) {
+    const secret = Deno.env.get('DAILY_NOTIFICATION_CRON_SECRET') ?? '';
+    const supplied = request.headers.get('x-edible-cron-secret') ?? '';
+    if (!secret || supplied !== secret) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
         headers: { ...corsHeaders, 'content-type': 'application/json' },
