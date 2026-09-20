@@ -1,90 +1,90 @@
-  workflows:
-    ios-release:
-      name: Edible iOS Release
-      max_build_duration: 120
-      instance_type: mac_mini_m2
+workflows:
+  ios-release:
+    name: Edible iOS Release
+    max_build_duration: 120
+    instance_type: mac_mini_m2
 
-      environment:
-        flutter: stable
+    environment:
+      flutter: stable
 
-        groups:
-          - edible_ios
+      groups:
+        - edible_ios
 
-        vars:
-          APP_STORE_APPLE_ID: "6811003746"
+      vars:
+        APP_STORE_APPLE_ID: "6811003746"
+        IOS_VERSION: "1.0.2"
 
-        ios_signing:
-          distribution_type: app_store
-          bundle_identifier: com.mndrs.edible
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.mndrs.edible
 
-      scripts:
-        - name: Get Flutter packages
-          script: |
-            set -e
-            flutter pub get
+    scripts:
+      - name: Get Flutter packages
+        script: |
+          set -e
+          flutter pub get
 
-        - name: Configure iOS Google Maps key
-          script: |
-            set -e
-            
-            mkdir -p "$CM_BUILD_DIR/ios/Flutter"
-            
-            cat > "$CM_BUILD_DIR/ios/Flutter/Secrets.xcconfig" <<EOF
-            GOOGLE_MAPS_API_KEY=$GOOGLE_MAPS_API_KEY
-            EOF
+      - name: Configure iOS Google Maps key
+        script: |
+          set -e
 
-        - name: Install CocoaPods dependencies
-          script: |
-            set -e
-            cd "$CM_BUILD_DIR/ios"
-            pod install --repo-update
+          mkdir -p "$CM_BUILD_DIR/ios/Flutter"
 
-        - name: Set up iOS code signing
-          script: |
-            set -e
-            xcode-project use-profiles
+          cat > "$CM_BUILD_DIR/ios/Flutter/Secrets.xcconfig" <<EOF
+          GOOGLE_MAPS_API_KEY=$GOOGLE_MAPS_API_KEY
+          EOF
 
-        - name: Calculate iOS build number
-          script: |
-            set -e
-            
-            LATEST_BUILD=$(app-store-connect get-latest-app-store-build-number "$APP_STORE_APPLE_ID" || echo "0")
-            
-            BUILD_NUMBER=$((LATEST_BUILD + 1))
-            
-            echo "========================================"
-            echo "Edible iOS Release"
-            echo "Latest App Store build: $LATEST_BUILD"
-            echo "New build number:       $BUILD_NUMBER"
-            echo "Version:                1.0.1"
-            echo "========================================"
-            
-            echo "BUILD_NUMBER=$BUILD_NUMBER" >> "$CM_ENV"
+      - name: Install CocoaPods dependencies
+        script: |
+          set -e
+          cd "$CM_BUILD_DIR/ios"
+          pod install --repo-update
 
-        - name: Build iOS IPA
-          script: |
-            set -e
-            
-            echo "Building Edible iOS..."
-            echo "Version: 1.0.1"
-            echo "Build:   $BUILD_NUMBER"
-            
-            flutter build ipa \
-              --release \
-              --build-name=1.0.1 \
-              --build-number="$BUILD_NUMBER" \
-              --dart-define=SUPABASE_URL="$SUPABASE_URL" \
-              --dart-define=SUPABASE_ANON_KEY="$SUPABASE_ANON_KEY" \
-              --export-options-plist=/Users/builder/export_options.plist
+      - name: Set up iOS code signing
+        script: |
+          set -e
+          xcode-project use-profiles
 
-      artifacts:
-        - build/ios/ipa/*.ipa
-        - /tmp/xcode_logs/*.log
-        - build/ios/archive/**/*.dSYM
+      - name: Calculate iOS build number
+        script: |
+          set -e
 
-      publishing:
-        app_store_connect:
-          api_key: $APP_STORE_CONNECT_PRIVATE_KEY
-          key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
-          issuer_id: $APP_STORE_CONNECT_ISSUER_ID
-          submit_to_testflight: true
+          LATEST_BUILD=$(app-store-connect get-latest-app-store-build-number "$APP_STORE_APPLE_ID" || echo "0")
+          BUILD_NUMBER=$((LATEST_BUILD + 1))
+
+          echo "========================================"
+          echo "Edible iOS Release"
+          echo "Latest App Store build: $LATEST_BUILD"
+          echo "New build number:       $BUILD_NUMBER"
+          echo "Version:                $IOS_VERSION"
+          echo "========================================"
+
+          echo "BUILD_NUMBER=$BUILD_NUMBER" >> "$CM_ENV"
+
+      - name: Build iOS IPA
+        script: |
+          set -e
+
+          echo "Building Edible iOS..."
+          echo "Version: $IOS_VERSION"
+          echo "Build:   $BUILD_NUMBER"
+
+          flutter build ipa \
+            --release \
+            --build-name="$IOS_VERSION" \
+            --build-number="$BUILD_NUMBER" \
+            --dart-define=SUPABASE_URL="$SUPABASE_URL" \
+            --dart-define=SUPABASE_ANON_KEY="$SUPABASE_ANON_KEY" \
+            --export-options-plist=/Users/builder/export_options.plist
+
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcode_logs/*.log
+      - build/ios/archive/**/*.dSYM
+
+    publishing:
+      app_store_connect:
+        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
+        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
+        submit_to_testflight: true
