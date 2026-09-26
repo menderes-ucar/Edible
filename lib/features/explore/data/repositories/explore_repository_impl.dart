@@ -7,6 +7,9 @@ import '../datasources/explore_local_data_source.dart';
 import '../datasources/explore_remote_data_source.dart';
 
 class ExploreRepositoryImpl implements ExploreRepository {
+  static const _manualAnitkabirImage =
+      'https://lylliolgjxmbpawkriww.supabase.co/storage/v1/object/public/edible-content-images/anitkabir-night.jpeg';
+
   ExploreRepositoryImpl({
     required ExploreRemoteDataSource remoteDataSource,
     required ExploreLocalDataSource localDataSource,
@@ -51,10 +54,10 @@ class ExploreRepositoryImpl implements ExploreRepository {
 
 
   List<ExploreContent> _mergeThree(
-    List<ExploreContent> bundled,
-    List<ExploreContent> remote,
-    List<ExploreContent> offline,
-  ) {
+      List<ExploreContent> bundled,
+      List<ExploreContent> remote,
+      List<ExploreContent> offline,
+      ) {
     final bundledById = <String, ExploreContent>{
       for (final item in bundled) item.id: item,
     };
@@ -68,9 +71,9 @@ class ExploreRepositoryImpl implements ExploreRepository {
       byId[remoteItem.id] = bundledItem == null
           ? remoteItem
           : _mergeRemoteWithBundledFallback(
-              remote: remoteItem,
-              bundled: bundledItem,
-            );
+        remote: remoteItem,
+        bundled: bundledItem,
+      );
     }
 
     return _dedupeSemantically(byId.values);
@@ -107,11 +110,33 @@ class ExploreRepositoryImpl implements ExploreRepository {
       galleryImageUrls: remote.galleryImageUrls.isNotEmpty
           ? remote.galleryImageUrls
           : bundled.galleryImageUrls,
-      coverImageUrl: remote.coverImageUrl?.trim().isNotEmpty == true
-          ? remote.coverImageUrl
-          : bundled.coverImageUrl,
+      coverImageUrl: _forceManualAnitkabirImage(
+        remote: remote.coverImageUrl,
+        bundled: bundled.coverImageUrl,
+        cityName: remote.cityName.isNotEmpty
+            ? remote.cityName
+            : bundled.cityName,
+        title: remote.title.isNotEmpty ? remote.title : bundled.title,
+      ),
       isFeatured: remote.isFeatured || bundled.isFeatured,
     );
+  }
+
+  String? _forceManualAnitkabirImage({
+    required String? remote,
+    required String? bundled,
+    required String cityName,
+    required String title,
+  }) {
+    final normalizedCity = cityName.trim().toLowerCase().replaceAll('ı', 'i');
+    final normalizedTitle = title.trim().toLowerCase().replaceAll('ı', 'i');
+
+    if (normalizedCity == 'ankara' && normalizedTitle == 'anıtkabir') {
+      return _manualAnitkabirImage;
+    }
+
+    if (remote?.trim().isNotEmpty == true) return remote;
+    return bundled;
   }
 
   ExploreMetadata _mergeMetadata({
@@ -124,7 +149,7 @@ class ExploreRepositoryImpl implements ExploreRepository {
       localTip: remote.localTip ?? bundled.localTip,
       openingInfo: remote.openingInfo ?? bundled.openingInfo,
       estimatedVisitMinutes:
-          remote.estimatedVisitMinutes ?? bundled.estimatedVisitMinutes,
+      remote.estimatedVisitMinutes ?? bundled.estimatedVisitMinutes,
       vegetarian: remote.vegetarian ?? bundled.vegetarian,
       vegan: remote.vegan ?? bundled.vegan,
       halal: remote.halal ?? bundled.halal,
@@ -133,15 +158,15 @@ class ExploreRepositoryImpl implements ExploreRepository {
       doText: remote.doText ?? bundled.doText,
       dontText: remote.dontText ?? bundled.dontText,
       coordinatePrecision:
-          remote.coordinatePrecision ?? bundled.coordinatePrecision,
+      remote.coordinatePrecision ?? bundled.coordinatePrecision,
       editorialStatus: remote.editorialStatus ?? bundled.editorialStatus,
     );
   }
 
   List<ExploreContent> _merge(
-    List<ExploreContent> primary,
-    List<ExploreContent> offline,
-  ) {
+      List<ExploreContent> primary,
+      List<ExploreContent> offline,
+      ) {
     final byId = <String, ExploreContent>{
       for (final item in offline) item.id: item,
       for (final item in primary) item.id: item,

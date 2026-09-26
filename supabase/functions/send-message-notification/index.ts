@@ -145,6 +145,22 @@ Deno.serve(async (request) => {
       });
     }
 
+    // Idempotency is claimed atomically in Postgres so concurrent requests
+    // cannot both send the same message notification.
+    const { data: claimed, error: claimError } = await admin.rpc(
+      'claim_message_push_delivery',
+      {
+        p_message_id: latestMessage.id,
+        p_recipient_id: recipient.user_id,
+      },
+    );
+    if (claimError) throw claimError;
+    if (claimed !== true) {
+      return new Response(JSON.stringify({ sent: 0, reason: 'already_sent_or_processing' }), {
+        headers: { ...corsHeaders, 'content-type': 'application/json' },
+      });
+    }
+
     const { data: profile } = await admin
       .from('profiles')
       .select('display_name')
@@ -162,6 +178,11 @@ Deno.serve(async (request) => {
     if (tokenError) throw tokenError;
 
     if (!serviceAccountRaw || !tokens?.length) {
+      await admin
+        .from('message_push_deliveries')
+        .delete()
+        .eq('message_id', latestMessage.id)
+        .eq('recipient_id', recipient.user_id);
       return new Response(JSON.stringify({ sent: 0, reason: !serviceAccountRaw ? 'fcm_not_configured' : 'no_tokens' }), {
         headers: { ...corsHeaders, 'content-type': 'application/json' },
       });
@@ -195,6 +216,20 @@ Deno.serve(async (request) => {
           .update({ enabled: false })
           .eq('id', device.id);
       }
+    }
+
+    if (sent > 0) {
+      await admin
+        .from('message_push_deliveries')
+        .update({ status: 'sent', updated_at: new Date().toISOString() })
+        .eq('message_id', latestMessage.id)
+        .eq('recipient_id', recipient.user_id);
+    } else {
+      await admin
+        .from('message_push_deliveries')
+        .delete()
+        .eq('message_id', latestMessage.id)
+        .eq('recipient_id', recipient.user_id);
     }
 
     return new Response(JSON.stringify({ sent }), {

@@ -530,7 +530,24 @@ async function writeCached(body: Body, candidate: Candidate): Promise<void> {
 serve(async request => {
   if (request.method === 'OPTIONS') return new Response('ok',{headers:corsHeaders});
   try {
+    // Explore is public content and must also work before login. Authentication
+    // is therefore optional here. Authenticated callers still get the existing
+    // per-user rate limit; anonymous callers can use cached/public resolution.
+    let authenticatedUserId: string | null = null;
+    const authHeader = request.headers.get('Authorization');
+    if (authHeader?.startsWith('Bearer ')) {
+      const accessToken = authHeader.slice('Bearer '.length).trim();
+      const { data: authData } = await supabaseAdmin.auth.getUser(accessToken);
+      authenticatedUserId = authData.user?.id ?? null;
+    }
+
     const body = await request.json() as Body;
+
+    // Best-effort cleanup; it never blocks image resolution.
+    await supabaseAdmin
+      .from('image_resolution_rate_limits')
+      .delete()
+      .lt('window_start', new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString());
     if (!clean(body.title)) return new Response(JSON.stringify({error:'title is required'}),{status:400,headers:{...corsHeaders,'Content-Type':'application/json'}});
 
     const cached = await readCached(body);
@@ -539,6 +556,20 @@ serve(async request => {
         status: 200,
         headers: {...corsHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=86400'},
       });
+    }
+
+    if (authenticatedUserId) {
+      const { data: allowed, error: rateError } = await supabaseAdmin.rpc(
+        'consume_image_resolution_rate_limit',
+        { p_user_id: authenticatedUserId, p_limit: 30 },
+      );
+      if (rateError) throw rateError;
+      if (allowed !== true) {
+        return new Response(JSON.stringify({ error: 'Rate limit exceeded. Try again later.' }), {
+          status: 429,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Retry-After': '3600' },
+        });
+      }
     }
 
     const tasks = [

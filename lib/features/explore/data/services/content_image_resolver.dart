@@ -28,12 +28,12 @@ class ResolvedContentImage {
   final double score;
 
   Map<String, dynamic> toJson() => {
-        'imageUrl': imageUrl,
-        'provider': provider,
-        'sourceUrl': sourceUrl,
-        'attribution': attribution,
-        'score': score,
-      };
+    'imageUrl': imageUrl,
+    'provider': provider,
+    'sourceUrl': sourceUrl,
+    'attribution': attribution,
+    'score': score,
+  };
 
   static ResolvedContentImage? fromJson(dynamic value) {
     if (value is! Map) return null;
@@ -54,7 +54,7 @@ class ContentImageResolver {
 
   static final instance = ContentImageResolver._();
 
-  static const _cacheFileName = 'edible_remote_image_cache_v1.json';
+  static const _cacheFileName = 'edible_remote_image_cache_v2.json';
   static const _maxConcurrentSearches = 4;
 
   final Map<String, Future<ResolvedContentImage?>> _inFlight = {};
@@ -63,16 +63,13 @@ class ContentImageResolver {
   int _running = 0;
   Future<Map<String, dynamic>>? _diskLoad;
 
+  // Keep the local key identical to the Edge Function/database cache key.
+  // Do not transliterate Turkish characters: image_resolutions stores the
+  // original Unicode letters.
   String _normalize(String value) => value
       .trim()
       .toLowerCase()
-      .replaceAll('ı', 'i')
-      .replaceAll('ğ', 'g')
-      .replaceAll('ü', 'u')
-      .replaceAll('ş', 's')
-      .replaceAll('ö', 'o')
-      .replaceAll('ç', 'c')
-      .replaceAll(RegExp(r'[^a-z0-9]+'), ' ')
+      .replaceAll(RegExp(r'[^\p{L}\p{N} ]', unicode: true), ' ')
       .replaceAll(RegExp(r'\s+'), ' ')
       .trim();
 
@@ -160,6 +157,26 @@ class ContentImageResolver {
   }) async {
     final key = _key(title: title, city: city, country: country);
 
+    // Anıtkabir in Ankara is manually managed in Supabase Storage.
+    // Do not search Wikimedia/Unsplash/etc. and do not reuse an old cached URL.
+    final isManualAnitkabir =
+        title.trim().toLowerCase() == 'anıtkabir' &&
+            city?.trim().toLowerCase() == 'ankara' &&
+            country?.trim().toLowerCase() == 'türkiye';
+    if (isManualAnitkabir) {
+      const manualUrl =
+          'https://lylliolgjxmbpawkriww.supabase.co/storage/v1/object/public/edible-content-images/anitkabir-night.jpeg';
+      const manualResult = ResolvedContentImage(
+        imageUrl: manualUrl,
+        provider: 'manual',
+        attribution: 'Edible',
+        score: 1.5,
+      );
+      _memoryCache[key] = manualResult;
+      await _saveDiskCache(key, manualResult);
+      return manualResult;
+    }
+
     final cached = await _readCached(key);
     if (cached != null) return cached;
 
@@ -237,15 +254,15 @@ class ContentImageResolver {
     try {
       final response = await client.functions
           .invoke(
-            'resolve-content-image',
-            body: {
-              'title': title.trim(),
-              'city': city?.trim(),
-              'country': country?.trim(),
-              'locale': _locale(locale),
-            },
-          )
-          .timeout(const Duration(seconds: 12));
+        'resolve-content-image',
+        body: {
+          'title': title.trim(),
+          'city': city?.trim(),
+          'country': country?.trim(),
+          'locale': _locale(locale),
+        },
+      )
+          .timeout(const Duration(seconds: 20));
 
       final data = response.data;
       if (data is! Map) return null;

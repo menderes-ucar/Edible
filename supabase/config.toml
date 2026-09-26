@@ -1,2 +1,17 @@
 [functions.resolve-content-image]
 verify_jwt = false
+
+[functions.resolve-content-description]
+verify_jwt = true
+
+[functions.send-message-notification]
+verify_jwt = true
+
+[functions.send-daily-discovery]
+verify_jwt = true
+
+[functions.revenuecat-webhook]
+verify_jwt = false
+
+[functions.delete-account]
+verify_jwt = true

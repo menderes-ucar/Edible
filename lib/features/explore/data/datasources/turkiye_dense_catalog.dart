@@ -614,8 +614,14 @@ List<ExploreContent> buildTurkiyeDenseCatalog() {
     description: 'Anıtkabir, Ankara seyahatinde öne çıkan ziyaret noktalarındandır.',
     latitude: 39.927400, longitude: 32.847700,
     tags: const ['turkiye_dense_v4','place'],
-    metadata: const ExploreMetadata(coordinatePrecision: 'city_area', editorialStatus: 'needs_exact_pin_review'),
-    galleryImageUrls: const [], isFeatured: true,
+    metadata: const ExploreMetadata(
+      coordinatePrecision: 'city_area',
+      editorialStatus: 'needs_exact_pin_review',
+    ),
+    galleryImageUrls: const [
+      'https://lylliolgjxmbpawkriww.supabase.co/storage/v1/object/public/edible-content-images/anitkabir-night.jpeg',
+    ],
+    isFeatured: true,
   ));
   items.add(ExploreContent(
     id: '35c47e4c-eb26-412e-a295-430166716202', countryCode: 'TR', countryName: 'Türkiye',

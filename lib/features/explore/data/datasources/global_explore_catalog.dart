@@ -2465,7 +2465,7 @@ const _items = <_GlobalCatalogItem>[
     title: 'Anıtkabir',
     latitude: 39.9334,
     longitude: 32.8657,
-    coverImageUrl: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1200&q=80',
+    coverImageUrl: 'https://lylliolgjxmbpawkriww.supabase.co/storage/v1/object/public/edible-content-images/anitkabir-night.jpeg',
     isFeatured: true,
   ),
   _GlobalCatalogItem(

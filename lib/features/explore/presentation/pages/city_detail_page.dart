@@ -58,15 +58,15 @@ class _CityDetailPageState extends State<CityDetailPage> {
 
     try {
       final all = await context.read<ExploreRepository>().getContents(
-            languageCode: languageCode,
-          );
+        languageCode: languageCode,
+      );
 
       if (!mounted || generation != _loadGeneration) return;
 
       setState(() {
         _items = all.where((item) {
           return item.countryCode.toLowerCase() ==
-                  widget.countryCode.toLowerCase() &&
+              widget.countryCode.toLowerCase() &&
               item.cityName.toLowerCase() == widget.cityName.toLowerCase();
         }).toList(growable: false);
         _error = null;
@@ -150,15 +150,21 @@ class _CityDetailPageState extends State<CityDetailPage> {
     final visible = _filter == null
         ? items
         : items
-            .where((item) => item.category == _filter)
-            .toList(growable: false);
+        .where((item) => item.category == _filter)
+        .toList(growable: false);
     final overview = CityDiscoveryOverviewBuilder.build(items);
     String? heroImage;
-    for (final item in items) {
-      final candidate = item.coverImageUrl?.trim();
-      if (candidate != null && candidate.isNotEmpty) {
-        heroImage = candidate;
-        break;
+    if (widget.cityName.trim().toLowerCase() == 'ankara' &&
+        widget.countryCode.trim().toUpperCase() == 'TR') {
+      heroImage =
+      'https://lylliolgjxmbpawkriww.supabase.co/storage/v1/object/public/edible-content-images/anitkabir-night.jpeg';
+    } else {
+      for (final item in items) {
+        final candidate = item.coverImageUrl?.trim();
+        if (candidate != null && candidate.isNotEmpty) {
+          heroImage = candidate;
+          break;
+        }
       }
     }
 
@@ -204,8 +210,8 @@ class _CityDetailPageState extends State<CityDetailPage> {
           Text(
             context.l10n.text('cityQuickActions'),
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.w900,
-                ),
+              fontWeight: FontWeight.w900,
+            ),
           ),
           const SizedBox(height: 10),
           _CityActionGrid(
@@ -250,8 +256,8 @@ class _CityDetailPageState extends State<CityDetailPage> {
           Text(
             context.l10n.text('cityTravelTools'),
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.w900,
-                ),
+              fontWeight: FontWeight.w900,
+            ),
           ),
           const SizedBox(height: 10),
           _CityToolCard(
@@ -264,44 +270,44 @@ class _CityDetailPageState extends State<CityDetailPage> {
             subtitle: context.l10n.text('offlinePackSubtitle'),
             trailing: offline.isLoading
                 ? const SizedBox.square(
-                    dimension: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
+              dimension: 20,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
                 : Icon(isDownloaded ? Icons.refresh_rounded : Icons.download_rounded),
             onTap: offline.isLoading
                 ? null
                 : () async {
-                    if (!PremiumGate.allowOrOpenPaywall(
-                      context,
-                      PremiumFeature.offlineCityPacks,
-                    )) {
-                      return;
-                    }
+              if (!PremiumGate.allowOrOpenPaywall(
+                context,
+                PremiumFeature.offlineCityPacks,
+              )) {
+                return;
+              }
 
-                    try {
-                      await context.read<OfflineCityPackProvider>().download(
-                            countryCode: widget.countryCode,
-                            cityName: widget.cityName,
-                            languageCode: languageCode,
-                          );
+              try {
+                await context.read<OfflineCityPackProvider>().download(
+                  countryCode: widget.countryCode,
+                  cityName: widget.cityName,
+                  languageCode: languageCode,
+                );
 
-                      if (!context.mounted) return;
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(context.l10n.text('offlinePackReady')),
-                        ),
-                      );
-                    } catch (error) {
-                      if (!context.mounted) return;
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            AppErrorPresenter.message(context, error),
-                          ),
-                        ),
-                      );
-                    }
-                  },
+                if (!context.mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(context.l10n.text('offlinePackReady')),
+                  ),
+                );
+              } catch (error) {
+                if (!context.mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      AppErrorPresenter.message(context, error),
+                    ),
+                  ),
+                );
+              }
+            },
           ),
           const SizedBox(height: 8),
           _CityToolCard(
@@ -326,8 +332,8 @@ class _CityDetailPageState extends State<CityDetailPage> {
                 child: Text(
                   context.l10n.text('discoverCity'),
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.w900,
-                      ),
+                    fontWeight: FontWeight.w900,
+                  ),
                 ),
               ),
               _CountBadge(
@@ -354,7 +360,7 @@ class _CityDetailPageState extends State<CityDetailPage> {
                 ...ExploreCategory.values
                     .where((category) => overview.countFor(category) > 0)
                     .map(
-                  (category) => Padding(
+                      (category) => Padding(
                     padding: const EdgeInsets.only(right: 8),
                     child: FilterChip(
                       selected: _filter == category,
@@ -496,9 +502,9 @@ class _CityHeroCard extends StatelessWidget {
                           text: context.l10n
                               .text('cityFeaturedCount')
                               .replaceAll(
-                                '{count}',
-                                '${overview.featuredCount}',
-                              ),
+                            '{count}',
+                            '${overview.featuredCount}',
+                          ),
                         ),
                     ],
                   ),
