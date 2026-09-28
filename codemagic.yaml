@@ -55,7 +55,12 @@ workflows:
           set -e
 
           LATEST_BUILD=$(app-store-connect get-latest-app-store-build-number "$APP_STORE_APPLE_ID" || echo "0")
-          BUILD_NUMBER=$((LATEST_BUILD + 1))
+
+          if [ "$LATEST_BUILD" -lt 6 ]; then
+            BUILD_NUMBER=6
+          else
+            BUILD_NUMBER=$((LATEST_BUILD + 1))
+          fi
 
           echo "========================================"
           echo "Edible iOS Release"
