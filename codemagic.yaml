@@ -24,6 +24,11 @@ workflows:
         bundle_identifier: com.mndrs.edible
 
     scripts:
+      - name: Disable Swift Package Manager
+        script: |
+          set -e
+          flutter config --no-enable-swift-package-manager
+
       - name: Get Flutter packages
         script: |
           set -e
@@ -74,6 +79,12 @@ workflows:
       - name: Build iOS IPA
         script: |
           set -e
+
+          echo "========================================"
+          echo "Building Edible iOS"
+          echo "Version: $IOS_VERSION"
+          echo "Build:   $BUILD_NUMBER"
+          echo "========================================"
 
           flutter build ipa \
             --release \

@@ -1,7 +1,8 @@
 name: edible
 description: "Edible - discover local culture, food and places."
 publish_to: "none"
-version: 1.0.0+4
+
+version: 1.0.3+7
 
 environment:
   sdk: ">=3.8.0 <4.0.0"
@@ -9,6 +10,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+
   flutter_localizations:
     sdk: flutter
 
@@ -33,6 +35,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
   flutter_lints: ^6.0.0
   flutter_launcher_icons: ^0.14.4
 
@@ -45,3 +48,6 @@ flutter_launcher_icons:
 
 flutter:
   uses-material-design: true
+
+  config:
+    enable-swift-package-manager: false
