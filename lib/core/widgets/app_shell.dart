@@ -43,11 +43,13 @@ class AppShell extends StatelessWidget {
                   if (states.contains(WidgetState.selected)) {
                     return const IconThemeData(
                       color: Colors.white,
+                      size: 21,
                     );
                   }
 
                   return const IconThemeData(
                     color: AppColors.textBrightBlack,
+                    size: 21,
                   );
                 },
               ),
@@ -55,18 +57,23 @@ class AppShell extends StatelessWidget {
                     (states) {
                   if (states.contains(WidgetState.selected)) {
                     return const TextStyle(
-                      color: Colors.white,
+                      color: AppColors.primaryDark,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w800,
                     );
                   }
 
                   return const TextStyle(
                     color: AppColors.textBrightBlack,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
                   );
                 },
               ),
             ),
             child: NavigationBar(
               height: 70,
+              labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
               elevation: 0,
               backgroundColor: AppColors.surfaceMint.withValues(alpha: 0.97),
               indicatorShape: const StadiumBorder(),

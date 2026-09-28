@@ -134,7 +134,7 @@ class ExploreContentCard extends StatelessWidget {
                       Row(children: [
                         const Icon(Icons.location_on_rounded, size: 15, color: AppColors.primaryDark),
                         const SizedBox(width: 4),
-                        Expanded(child: Text(content.locationLabel, maxLines: 1, overflow: TextOverflow.ellipsis, style: theme.textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w800, color: AppColors.primaryDark))),
+                        Expanded(child: Text(content.locationLabel, maxLines: 1, overflow: TextOverflow.ellipsis, style: theme.textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w800, color: Colors.black))),
                       ]),
                       if (description.isNotEmpty) ...[
                         const SizedBox(height: 7),

@@ -354,7 +354,7 @@ class _LanguageTile extends StatelessWidget {
       child: Row(children: [
         Container(width: 49, height: 49, decoration: BoxDecoration(gradient: AppColors.gradientBrand, borderRadius: BorderRadius.circular(17)), child: const Icon(Icons.translate_rounded, color: Colors.white)),
         const SizedBox(width: 12),
-        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(context.l10n.text('language'), style: const TextStyle(fontSize: 11, color: AppColors.textMuted, fontWeight: FontWeight.w700)), Text(current?.nativeName ?? localeProvider.locale.languageCode.toUpperCase(), style: const TextStyle(fontWeight: FontWeight.w900, color: AppColors.textPrimary))])),
+        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(context.l10n.text('language'), style: const TextStyle(fontSize: 11, color: Colors.black, fontWeight: FontWeight.w700)), Text(current?.nativeName ?? localeProvider.locale.languageCode.toUpperCase(), style: const TextStyle(fontWeight: FontWeight.w900, color: AppColors.textPrimary))])),
         DropdownButtonHideUnderline(child: DropdownButton<String>(value: localeProvider.locale.languageCode, borderRadius: BorderRadius.circular(16), items: LocaleProvider.availableLocales.map((locale) { final language = AppLanguage.fromCode(locale.languageCode); return DropdownMenuItem(value: locale.languageCode, child: Text(language?.nativeName ?? locale.languageCode.toUpperCase())); }).toList(), onChanged: (value) { if (value != null) localeProvider.setLocale(Locale(value)); })),
       ]),
     );

@@ -180,7 +180,9 @@ class _LoginPageState extends State<LoginPage> {
       child: InputDecorator(
         decoration: InputDecoration(
           labelText: label,
-          prefixIcon: const Icon(Icons.public_rounded),
+          labelStyle: const TextStyle(color: Colors.black),
+          floatingLabelStyle: const TextStyle(color: Colors.black, fontWeight: FontWeight.w700),
+          prefixIcon: const Icon(Icons.public_rounded, color: Colors.black),
           suffixIcon: const Icon(Icons.keyboard_arrow_down_rounded),
         ),
         child: Text(
@@ -188,7 +190,7 @@ class _LoginPageState extends State<LoginPage> {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
-            color: selected == null ? AppColors.textMuted : AppColors.textPrimary,
+            color: Colors.black,
             fontWeight: selected == null ? FontWeight.w500 : FontWeight.w800,
           ),
         ),
@@ -265,12 +267,21 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _field(String label, IconData icon, TextEditingController controller) {
-    return TextField(controller: controller, textInputAction: TextInputAction.next, decoration: InputDecoration(labelText: label, prefixIcon: Icon(icon)));
+    return TextField(
+      controller: controller,
+      textInputAction: TextInputAction.next,
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: const TextStyle(color: Colors.black),
+        floatingLabelStyle: const TextStyle(color: Colors.black, fontWeight: FontWeight.w700),
+        prefixIcon: Icon(icon, color: Colors.black),
+      ),
+    );
   }
 
   Widget _genderChip(String label, String value, IconData icon) {
     final selected = _gender == value;
-    return ChoiceChip(selected: selected, onSelected: (v) { if (v) setState(() => _gender = value); }, avatar: Icon(icon, size: 17, color: selected ? AppColors.primaryDark : AppColors.textMuted), label: Text(label));
+    return ChoiceChip(selected: selected, onSelected: (v) { if (v) setState(() => _gender = value); }, avatar: Icon(icon, size: 17, color: selected ? AppColors.primaryDark : Colors.black), label: Text(label, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w700)));
   }
 }
 
@@ -294,21 +305,21 @@ class _AuthForm extends StatelessWidget {
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [Container(width: 38, height: 38, decoration: BoxDecoration(color: AppColors.primarySoft, borderRadius: BorderRadius.circular(13)), child: const Icon(Icons.auto_awesome_rounded, color: AppColors.primaryDark, size: 20)), const SizedBox(width: 10), Expanded(child: Text(signUp ? l10n.text('createExplorerAccount') : l10n.text('welcomeBackExplorer'), style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w900)))]),
         const SizedBox(height: 6),
-        Text(signUp ? l10n.text('registerSubtitle') : l10n.text('loginSubtitle'), style: const TextStyle(color: AppColors.textMuted, fontSize: 13, height: 1.35)),
+        Text(signUp ? l10n.text('registerSubtitle') : l10n.text('loginSubtitle'), style: const TextStyle(color: Colors.black, fontSize: 13, height: 1.35)),
         const SizedBox(height: 18),
         if (signUp) ...[
           Row(children: [Expanded(child: parent._field(l10n.text('firstName'), Icons.person_outline, parent._firstNameController)), const SizedBox(width: 10), Expanded(child: parent._field(l10n.text('lastName'), Icons.badge_outlined, parent._lastNameController))]),
           const SizedBox(height: 11),
-          Row(children: [Expanded(child: TextField(controller: parent._ageController, keyboardType: TextInputType.number, decoration: InputDecoration(labelText: l10n.text('age'), prefixIcon: const Icon(Icons.cake_outlined)))), const SizedBox(width: 10), Expanded(child: parent._countryField(l10n.text('hometown')))]),
+          Row(children: [Expanded(child: TextField(controller: parent._ageController, keyboardType: TextInputType.number, decoration: InputDecoration(labelText: l10n.text('age'), labelStyle: const TextStyle(color: Colors.black), floatingLabelStyle: const TextStyle(color: Colors.black, fontWeight: FontWeight.w700), prefixIcon: const Icon(Icons.cake_outlined, color: Colors.black)))), const SizedBox(width: 10), Expanded(child: parent._countryField(l10n.text('hometown')))]),
           const SizedBox(height: 14),
           Text(l10n.text('gender'), style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 13)),
           const SizedBox(height: 8),
           Wrap(spacing: 7, runSpacing: 7, children: [parent._genderChip(l10n.text('female'), 'female', Icons.woman_rounded), parent._genderChip(l10n.text('male'), 'male', Icons.man_rounded), parent._genderChip(l10n.text('nonBinary'), 'non_binary', Icons.people_outline_rounded), parent._genderChip(l10n.text('preferNotToSay'), 'prefer_not_to_say', Icons.more_horiz_rounded)]),
           const SizedBox(height: 14),
         ],
-        TextField(controller: parent._emailController, focusNode: parent._emailFocusNode, keyboardType: TextInputType.emailAddress, textInputAction: TextInputAction.next, autofillHints: const [AutofillHints.email], onSubmitted: (_) => parent._passwordFocusNode.requestFocus(), decoration: InputDecoration(labelText: l10n.text('email'), prefixIcon: const Icon(Icons.mail_outline_rounded))),
+        TextField(controller: parent._emailController, focusNode: parent._emailFocusNode, keyboardType: TextInputType.emailAddress, textInputAction: TextInputAction.next, autofillHints: const [AutofillHints.email], onSubmitted: (_) => parent._passwordFocusNode.requestFocus(), decoration: InputDecoration(labelText: l10n.text('email'), labelStyle: const TextStyle(color: Colors.black), floatingLabelStyle: const TextStyle(color: Colors.black, fontWeight: FontWeight.w700), prefixIcon: const Icon(Icons.mail_outline_rounded, color: Colors.black))),
         const SizedBox(height: 10),
-        TextField(controller: parent._passwordController, focusNode: parent._passwordFocusNode, obscureText: parent._obscurePassword, textInputAction: TextInputAction.done, autofillHints: [signUp ? AutofillHints.newPassword : AutofillHints.password], onSubmitted: (_) { if (!auth.isLoading) parent._submit(); }, decoration: InputDecoration(labelText: l10n.text('password'), prefixIcon: const Icon(Icons.lock_outline_rounded), suffixIcon: IconButton(onPressed: auth.isLoading ? null : () => parent.setState(() => parent._obscurePassword = !parent._obscurePassword), icon: Icon(parent._obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined)))),
+        TextField(controller: parent._passwordController, focusNode: parent._passwordFocusNode, obscureText: parent._obscurePassword, textInputAction: TextInputAction.done, autofillHints: [signUp ? AutofillHints.newPassword : AutofillHints.password], onSubmitted: (_) { if (!auth.isLoading) parent._submit(); }, decoration: InputDecoration(labelText: l10n.text('password'), labelStyle: const TextStyle(color: Colors.black), floatingLabelStyle: const TextStyle(color: Colors.black, fontWeight: FontWeight.w700), prefixIcon: const Icon(Icons.lock_outline_rounded, color: Colors.black), suffixIcon: IconButton(onPressed: auth.isLoading ? null : () => parent.setState(() => parent._obscurePassword = !parent._obscurePassword), icon: Icon(parent._obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined, color: Colors.black)))),
         if (auth.errorMessage != null) ...[
           const SizedBox(height: 11),
           Container(width: double.infinity, padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: AppColors.error.withValues(alpha: .08), borderRadius: BorderRadius.circular(15)), child: Text(AppErrorPresenter.message(context, auth.errorMessage), style: const TextStyle(color: AppColors.error, fontWeight: FontWeight.w700))),
@@ -317,7 +328,7 @@ class _AuthForm extends StatelessWidget {
         SizedBox(width: double.infinity, child: FilledButton(onPressed: auth.isLoading ? null : parent._submit, child: auth.isLoading ? const SizedBox.square(dimension: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : Text(l10n.text(signUp ? 'createAccount' : 'signIn')))),
         const SizedBox(height: 4),
         Center(child: TextButton(onPressed: auth.isLoading ? null : () => parent._toggleMode(auth), child: Text(l10n.text(signUp ? 'alreadyHaveAccountSignIn' : 'newToEdibleCreateAccount')))),
-        Row(mainAxisAlignment: MainAxisAlignment.center, children: [const Icon(Icons.verified_user_outlined, size: 14, color: AppColors.primaryDark), const SizedBox(width: 5), Text(l10n.text('secureAccount'), style: const TextStyle(color: AppColors.textMuted, fontSize: 11, fontWeight: FontWeight.w600))]),
+        Row(mainAxisAlignment: MainAxisAlignment.center, children: [const Icon(Icons.verified_user_outlined, size: 14, color: AppColors.primaryDark), const SizedBox(width: 5), Text(l10n.text('secureAccount'), style: const TextStyle(color: Colors.black, fontSize: 11, fontWeight: FontWeight.w600))]),
       ]),
     );
   }
@@ -401,5 +412,5 @@ class _ModeItem extends StatelessWidget {
   const _ModeItem({required this.label, required this.selected, required this.onTap});
   final String label; final bool selected; final VoidCallback? onTap;
   @override
-  Widget build(BuildContext context) => Material(color: selected ? AppColors.darkNavy : Colors.transparent, borderRadius: BorderRadius.circular(17), child: InkWell(onTap: onTap, borderRadius: BorderRadius.circular(17), child: Padding(padding: const EdgeInsets.symmetric(vertical: 13), child: Center(child: Text(label, style: TextStyle(color: selected ? Colors.white : AppColors.textMuted, fontWeight: FontWeight.w900))))));
+  Widget build(BuildContext context) => Material(color: selected ? AppColors.darkNavy : Colors.transparent, borderRadius: BorderRadius.circular(17), child: InkWell(onTap: onTap, borderRadius: BorderRadius.circular(17), child: Padding(padding: const EdgeInsets.symmetric(vertical: 13), child: Center(child: Text(label, style: TextStyle(color: selected ? Colors.white : Colors.black, fontWeight: FontWeight.w900))))));
 }
