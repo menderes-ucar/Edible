@@ -47,8 +47,33 @@ workflows:
       - name: Install CocoaPods dependencies
         script: |
           set -e
+
           cd "$CM_BUILD_DIR/ios"
-          pod install --repo-update
+
+          echo "Installing CocoaPods dependencies..."
+
+          export COCOAPODS_DISABLE_STATS=true
+
+          for i in 1 2 3 4 5; do
+            echo "========================================"
+            echo "CocoaPods attempt: $i/5"
+            echo "========================================"
+
+            if pod install --repo-update --verbose; then
+              echo "CocoaPods installation completed successfully."
+              exit 0
+            fi
+
+            echo "CocoaPods attempt $i failed."
+
+            if [ "$i" -lt 5 ]; then
+              echo "Waiting 15 seconds before retry..."
+              sleep 15
+            fi
+          done
+
+          echo "CocoaPods installation failed after 5 attempts."
+          exit 1
 
       - name: Set up iOS code signing
         script: |
