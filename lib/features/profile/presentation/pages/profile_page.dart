@@ -22,7 +22,7 @@ class ProfilePage extends StatelessWidget {
     final user = auth.user;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF2D2D2D),
+      backgroundColor: AppColors.surfaceMint,
       body: Stack(
         children: [
           Positioned(top: -110, right: -85, child: _Orb(size: 250, color: Colors.white.withValues(alpha: .10))),
@@ -32,11 +32,11 @@ class ProfilePage extends StatelessWidget {
             slivers: [
               SliverAppBar(
                 pinned: true,
-                backgroundColor: AppColors.backgroundDeep.withValues(alpha: .94),
-                foregroundColor: Colors.white,
+                backgroundColor: AppColors.surfaceMint.withValues(alpha: .97),
+                foregroundColor: Colors.black,
                 elevation: 0,
                 scrolledUnderElevation: 0,
-                title: Text(context.l10n.text('profile'), style: const TextStyle(fontWeight: FontWeight.w900, color: Colors.white)),
+                title: Text(context.l10n.text('profile'), style: const TextStyle(fontWeight: FontWeight.w900, color: Colors.black)),
               ),
               SliverPadding(
                 padding: const EdgeInsets.fromLTRB(16, 14, 16, 34),
@@ -354,8 +354,8 @@ class _LanguageTile extends StatelessWidget {
       child: Row(children: [
         Container(width: 49, height: 49, decoration: BoxDecoration(gradient: AppColors.gradientBrand, borderRadius: BorderRadius.circular(17)), child: const Icon(Icons.translate_rounded, color: Colors.white)),
         const SizedBox(width: 12),
-        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(context.l10n.text('language'), style: const TextStyle(fontSize: 11, color: Colors.black, fontWeight: FontWeight.w700)), Text(current?.nativeName ?? localeProvider.locale.languageCode.toUpperCase(), style: const TextStyle(fontWeight: FontWeight.w900, color: AppColors.textPrimary))])),
-        DropdownButtonHideUnderline(child: DropdownButton<String>(value: localeProvider.locale.languageCode, borderRadius: BorderRadius.circular(16), items: LocaleProvider.availableLocales.map((locale) { final language = AppLanguage.fromCode(locale.languageCode); return DropdownMenuItem(value: locale.languageCode, child: Text(language?.nativeName ?? locale.languageCode.toUpperCase())); }).toList(), onChanged: (value) { if (value != null) localeProvider.setLocale(Locale(value)); })),
+        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(context.l10n.text('language'), style: const TextStyle(fontSize: 11, color: Colors.black, fontWeight: FontWeight.w700)), Text(current?.nativeName ?? localeProvider.locale.languageCode.toUpperCase(), style: const TextStyle(fontWeight: FontWeight.w900, color: Colors.black))])),
+        DropdownButtonHideUnderline(child: DropdownButton<String>(value: localeProvider.locale.languageCode, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w900), icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.black), borderRadius: BorderRadius.circular(16), items: LocaleProvider.availableLocales.map((locale) { final language = AppLanguage.fromCode(locale.languageCode); return DropdownMenuItem(value: locale.languageCode, child: Text(language?.nativeName ?? locale.languageCode.toUpperCase())); }).toList(), onChanged: (value) { if (value != null) localeProvider.setLocale(Locale(value)); })),
       ]),
     );
   }
@@ -372,7 +372,22 @@ class _GuestAction extends StatelessWidget {
       Container(width: 46, height: 46, decoration: BoxDecoration(color: AppColors.primary.withValues(alpha: .14), borderRadius: BorderRadius.circular(15)), child: const Icon(Icons.login_rounded, color: AppColors.primaryDark)),
       const SizedBox(width: 11),
       Expanded(child: Text(context.l10n.text('signIn'), style: const TextStyle(fontWeight: FontWeight.w900, color: AppColors.textPrimary))),
-      FilledButton(onPressed: onTap, child: Text(context.l10n.text('signIn'))),
+      SizedBox(
+        width: 92,
+        child: FilledButton(
+          onPressed: onTap,
+          style: FilledButton.styleFrom(
+            backgroundColor: AppColors.primaryDark,
+            foregroundColor: Colors.white,
+            minimumSize: const Size(92, 48),
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+          ),
+          child: Text(
+            context.l10n.text('signIn'),
+            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900),
+          ),
+        ),
+      ),
     ]),
   );
 }

@@ -129,7 +129,7 @@ class ExploreContentCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(content.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w900, height: 1.08)),
+                      Text(content.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w900, height: 1.08, color: Colors.black)),
                       const SizedBox(height: 7),
                       Row(children: [
                         const Icon(Icons.location_on_rounded, size: 15, color: AppColors.primaryDark),
@@ -138,7 +138,7 @@ class ExploreContentCard extends StatelessWidget {
                       ]),
                       if (description.isNotEmpty) ...[
                         const SizedBox(height: 7),
-                        Text(description, maxLines: 1, overflow: TextOverflow.ellipsis, style: theme.textTheme.bodySmall?.copyWith(height: 1.35, color: AppColors.textMuted)),
+                        Text(description, maxLines: 1, overflow: TextOverflow.ellipsis, style: theme.textTheme.bodySmall?.copyWith(height: 1.35, color: Colors.black, fontWeight: FontWeight.w600)),
                       ],
                     ],
                   ),

@@ -86,8 +86,8 @@ workflows:
 
           LATEST_BUILD=$(app-store-connect get-latest-app-store-build-number "$APP_STORE_APPLE_ID" || echo "0")
 
-          if [ "$LATEST_BUILD" -lt 10 ]; then
-            BUILD_NUMBER=10
+          if [ "$LATEST_BUILD" -lt 11 ]; then
+            BUILD_NUMBER=11
           else
             BUILD_NUMBER=$((LATEST_BUILD + 1))
           fi

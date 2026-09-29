@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 /// Edible fresh travel visual system.
 /// Strong aqua background, colored surfaces and high-contrast organic accents.
 abstract final class AppColors {
-  static const Color background = Color(0xFF2D2D2D);
-  static const Color backgroundDeep = Color(0xFF242424);
+  static const Color background = primary;
+  static const Color backgroundDeep = Color(0xFF0A0A0A);
   static const Color surface = Color(0xFFFFE2C4);
   static const Color surfaceStrong = Color(0xFFFFE2C4);
   static const Color surfaceDeep = Color(0xFFFFE2C4);
@@ -14,9 +14,9 @@ abstract final class AppColors {
   static const Color primaryDark = Color(0xFF075B57);
   static const Color primarySoft = Color(0xFF8DE0D7);
 
-  static const Color textPrimary = Color(0xFF073B39);
-  static const Color textMuted = Color(0xFF356865);
-  static const Color textLight = Color(0xFF6D9894);
+  static const Color textPrimary = Color(0xFF000000);
+  static const Color textMuted = Color(0xFF111111);
+  static const Color textLight = Color(0xFF222222);
   static const Color border = Color(0xFF70C9C0);
   static const Color divider = Color(0xFF92D9D2);
 
@@ -45,7 +45,7 @@ abstract final class AppColors {
   static const Color lightGray = Color(0xFFDDF3EF);
   static const Color mediumGray = border;
   static const Color gray = Color(0xFFA7C4C0);
-  static const Color darkGray = Color(0xFF476A67);
+  static const Color darkGray = Color(0xFF111111);
   static const Color textBrightBlack = Color(0xFF111111);
   static const Color textSoftWhite = Color(0xFFE6E6E6);
   static const Color textDark = textPrimary;

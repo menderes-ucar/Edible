@@ -42,14 +42,12 @@ class AppShell extends StatelessWidget {
                     (states) {
                   if (states.contains(WidgetState.selected)) {
                     return const IconThemeData(
-                      color: Colors.white,
-                      size: 21,
+                      color: AppColors.primaryDark,
                     );
                   }
 
                   return const IconThemeData(
                     color: AppColors.textBrightBlack,
-                    size: 21,
                   );
                 },
               ),

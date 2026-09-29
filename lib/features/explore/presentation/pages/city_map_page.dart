@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/error/app_error_presenter.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../domain/entities/explore_content.dart';
 import '../../domain/repositories/explore_repository.dart';
 import '../widgets/smart_content_image.dart';
@@ -127,6 +128,8 @@ class _CityMapPageState extends State<CityMapPage> {
         Positioned(
           right: 16, bottom: 20,
           child: FloatingActionButton.extended(
+            backgroundColor: AppColors.primary,
+            foregroundColor: Colors.white,
             onPressed: () => _controller?.animateCamera(CameraUpdate.newLatLngZoom(center, 12.5)),
             icon: const Icon(Icons.center_focus_strong_rounded),
             label: Text(context.l10n.text('showCity')),
@@ -144,33 +147,72 @@ class _MapItemSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final description = item.description.trim().isNotEmpty ? item.description : item.shortDescription;
+    final description = item.description.trim().isNotEmpty
+        ? item.description.trim()
+        : item.shortDescription.trim();
+    final maxHeight = MediaQuery.sizeOf(context).height * .82;
+
     return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 18),
-        child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(18),
-            child: SizedBox(height: 180, width: double.infinity, child: SmartContentImage(
-              title: item.title,
-              locale: Localizations.localeOf(context).languageCode,
-              city: item.cityName,
-              country: item.countryName,
-              category: item.category.value,
-              preferredUrl: item.coverImageUrl,
-            )),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxHeight: maxHeight),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 18),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(18),
+                child: SizedBox(
+                  height: 170,
+                  width: double.infinity,
+                  child: SmartContentImage(
+                    title: item.title,
+                    locale: Localizations.localeOf(context).languageCode,
+                    city: item.cityName,
+                    country: item.countryName,
+                    category: item.category.value,
+                    preferredUrl: item.coverImageUrl,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                item.title,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context)
+                    .textTheme
+                    .titleLarge
+                    ?.copyWith(fontWeight: FontWeight.w900),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                '${item.cityName}, ${item.countryName}',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+              if (description.isNotEmpty) ...[
+                const SizedBox(height: 9),
+                Text(
+                  description,
+                  maxLines: 5,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+              const SizedBox(height: 14),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton.icon(
+                  onPressed: onOpen,
+                  icon: const Icon(Icons.open_in_new_rounded),
+                  label: Text(context.l10n.text('openDetails')),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 12),
-          Text(item.title, style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900)),
-          const SizedBox(height: 4),
-          Text('${item.cityName}, ${item.countryName}', style: Theme.of(context).textTheme.bodySmall),
-          if (description.isNotEmpty) ...[
-            const SizedBox(height: 9),
-            Text(description, maxLines: 5, overflow: TextOverflow.ellipsis),
-          ],
-          const SizedBox(height: 14),
-          SizedBox(width: double.infinity, child: FilledButton.icon(onPressed: onOpen, icon: const Icon(Icons.open_in_new_rounded), label: Text(context.l10n.text('openDetails')))),
-        ]),
+        ),
       ),
     );
   }

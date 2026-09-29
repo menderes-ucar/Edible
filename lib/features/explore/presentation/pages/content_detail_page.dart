@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/router/app_routes.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../favorites/presentation/providers/favorites_provider.dart';
 import '../../../progress/domain/entities/content_progress.dart';
@@ -468,6 +469,12 @@ class _ContentDetailPageState extends State<ContentDetailPage> {
                   SizedBox(
                     width: double.infinity,
                     child: OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        backgroundColor: AppColors.primaryDark,
+                        side: const BorderSide(color: AppColors.primaryDark, width: 1.5),
+                        minimumSize: const Size.fromHeight(52),
+                      ),
                       onPressed: () => context.push(
                         AppRoutes.cityMapFor(
                           countryCode: content.countryCode,

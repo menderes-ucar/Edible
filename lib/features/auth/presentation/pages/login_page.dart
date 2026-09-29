@@ -161,7 +161,7 @@ class _LoginPageState extends State<LoginPage> {
               style: OutlinedButton.styleFrom(
                 foregroundColor: Colors.white,
                 side: const BorderSide(color: Colors.white24),
-                backgroundColor: const Color(0xFF383838),
+                backgroundColor: const Color(0xFF2D2D2D),
               ),
             ),
           ],
@@ -183,7 +183,7 @@ class _LoginPageState extends State<LoginPage> {
           labelStyle: const TextStyle(color: Colors.black),
           floatingLabelStyle: const TextStyle(color: Colors.black, fontWeight: FontWeight.w700),
           prefixIcon: const Icon(Icons.public_rounded, color: Colors.black),
-          suffixIcon: const Icon(Icons.keyboard_arrow_down_rounded),
+          suffixIcon: const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.black),
         ),
         child: Text(
           selected?.name ?? label,
@@ -281,7 +281,28 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _genderChip(String label, String value, IconData icon) {
     final selected = _gender == value;
-    return ChoiceChip(selected: selected, onSelected: (v) { if (v) setState(() => _gender = value); }, avatar: Icon(icon, size: 17, color: selected ? AppColors.primaryDark : Colors.black), label: Text(label, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w700)));
+    return ChoiceChip(
+      selected: selected,
+      onSelected: (v) { if (v) setState(() => _gender = value); },
+      backgroundColor: AppColors.surface,
+      selectedColor: AppColors.primary,
+      side: BorderSide(
+        color: selected ? AppColors.primary : AppColors.border,
+        width: selected ? 1.5 : 1,
+      ),
+      avatar: Icon(
+        icon,
+        size: 17,
+        color: selected ? Colors.white : Colors.black,
+      ),
+      label: Text(
+        label,
+        style: TextStyle(
+          color: selected ? Colors.white : Colors.black,
+          fontWeight: FontWeight.w900,
+        ),
+      ),
+    );
   }
 }
 
@@ -297,22 +318,22 @@ class _AuthForm extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(17, 18, 17, 15),
       decoration: BoxDecoration(
-        color: AppColors.surfaceMint,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(30),
         border: Border.all(color: AppColors.primary.withValues(alpha: .12)),
         boxShadow: [BoxShadow(color: AppColors.primary.withValues(alpha: .10), blurRadius: 30, offset: const Offset(0, 14))],
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [Container(width: 38, height: 38, decoration: BoxDecoration(color: AppColors.primarySoft, borderRadius: BorderRadius.circular(13)), child: const Icon(Icons.auto_awesome_rounded, color: AppColors.primaryDark, size: 20)), const SizedBox(width: 10), Expanded(child: Text(signUp ? l10n.text('createExplorerAccount') : l10n.text('welcomeBackExplorer'), style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w900)))]),
+        Row(children: [Container(width: 38, height: 38, decoration: BoxDecoration(color: AppColors.primarySoft, borderRadius: BorderRadius.circular(13)), child: const Icon(Icons.auto_awesome_rounded, color: AppColors.primaryDark, size: 20)), const SizedBox(width: 10), Expanded(child: Text(signUp ? l10n.text('createExplorerAccount') : l10n.text('welcomeExplorer'), style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w900, color: Colors.black)))]),
         const SizedBox(height: 6),
-        Text(signUp ? l10n.text('registerSubtitle') : l10n.text('loginSubtitle'), style: const TextStyle(color: Colors.black, fontSize: 13, height: 1.35)),
+        Text(signUp ? l10n.text('registerSubtitle') : l10n.text('loginSubtitle'), style: const TextStyle(color: Colors.black, fontSize: 13, height: 1.35, fontWeight: FontWeight.w600)),
         const SizedBox(height: 18),
         if (signUp) ...[
           Row(children: [Expanded(child: parent._field(l10n.text('firstName'), Icons.person_outline, parent._firstNameController)), const SizedBox(width: 10), Expanded(child: parent._field(l10n.text('lastName'), Icons.badge_outlined, parent._lastNameController))]),
           const SizedBox(height: 11),
           Row(children: [Expanded(child: TextField(controller: parent._ageController, keyboardType: TextInputType.number, decoration: InputDecoration(labelText: l10n.text('age'), labelStyle: const TextStyle(color: Colors.black), floatingLabelStyle: const TextStyle(color: Colors.black, fontWeight: FontWeight.w700), prefixIcon: const Icon(Icons.cake_outlined, color: Colors.black)))), const SizedBox(width: 10), Expanded(child: parent._countryField(l10n.text('hometown')))]),
           const SizedBox(height: 14),
-          Text(l10n.text('gender'), style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 13)),
+          Text(l10n.text('gender'), style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 13, color: Colors.black)),
           const SizedBox(height: 8),
           Wrap(spacing: 7, runSpacing: 7, children: [parent._genderChip(l10n.text('female'), 'female', Icons.woman_rounded), parent._genderChip(l10n.text('male'), 'male', Icons.man_rounded), parent._genderChip(l10n.text('nonBinary'), 'non_binary', Icons.people_outline_rounded), parent._genderChip(l10n.text('preferNotToSay'), 'prefer_not_to_say', Icons.more_horiz_rounded)]),
           const SizedBox(height: 14),
@@ -325,9 +346,9 @@ class _AuthForm extends StatelessWidget {
           Container(width: double.infinity, padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: AppColors.error.withValues(alpha: .08), borderRadius: BorderRadius.circular(15)), child: Text(AppErrorPresenter.message(context, auth.errorMessage), style: const TextStyle(color: AppColors.error, fontWeight: FontWeight.w700))),
         ],
         const SizedBox(height: 16),
-        SizedBox(width: double.infinity, child: FilledButton(onPressed: auth.isLoading ? null : parent._submit, child: auth.isLoading ? const SizedBox.square(dimension: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : Text(l10n.text(signUp ? 'createAccount' : 'signIn')))),
+        SizedBox(width: double.infinity, child: FilledButton(style: FilledButton.styleFrom(backgroundColor: AppColors.primaryDark, foregroundColor: Colors.black, disabledBackgroundColor: AppColors.primaryDark.withValues(alpha: .55), disabledForegroundColor: Colors.black54, padding: const EdgeInsets.symmetric(vertical: 15)), onPressed: auth.isLoading ? null : parent._submit, child: auth.isLoading ? const SizedBox.square(dimension: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : Text(l10n.text(signUp ? 'createAccount' : 'signIn'), style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w900)))),
         const SizedBox(height: 4),
-        Center(child: TextButton(onPressed: auth.isLoading ? null : () => parent._toggleMode(auth), child: Text(l10n.text(signUp ? 'alreadyHaveAccountSignIn' : 'newToEdibleCreateAccount')))),
+        Center(child: TextButton(style: TextButton.styleFrom(foregroundColor: AppColors.primaryDark), onPressed: auth.isLoading ? null : () => parent._toggleMode(auth), child: Text(l10n.text(signUp ? 'alreadyHaveAccountSignIn' : 'newToEdibleCreateAccount'), style: const TextStyle(color: AppColors.primaryDark, fontWeight: FontWeight.w900)))),
         Row(mainAxisAlignment: MainAxisAlignment.center, children: [const Icon(Icons.verified_user_outlined, size: 14, color: AppColors.primaryDark), const SizedBox(width: 5), Text(l10n.text('secureAccount'), style: const TextStyle(color: Colors.black, fontSize: 11, fontWeight: FontWeight.w600))]),
       ]),
     );
@@ -345,9 +366,9 @@ class _AuthTravelHero extends StatelessWidget {
       height: 214,
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        color: const Color(0xFF383838),
+        color: AppColors.primary,
         borderRadius: BorderRadius.circular(30),
-        border: Border.all(color: Colors.white12),
+        border: Border.all(color: AppColors.primary),
       ),
       child: Stack(children: [
         Positioned(right: -38, top: -46, child: _Bubble(size: 160, opacity: .07)),
@@ -358,7 +379,7 @@ class _AuthTravelHero extends StatelessWidget {
         Positioned(left: 22, bottom: 22, right: 22, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(isSignUp ? l10n.text('joinEdible') : l10n.text('welcomeBackExplorer'), maxLines: 2, style: const TextStyle(color: Colors.white, fontSize: 27, height: 1.02, fontWeight: FontWeight.w900)),
           const SizedBox(height: 7),
-          Text(isSignUp ? 'Rotanı kaydet, şehirleri keşfet, kendi seyahat hikâyeni oluştur.' : 'Bir sonraki rotanı kaldığın yerden keşfet.', maxLines: 2, style: const TextStyle(color: Colors.white70, fontSize: 13, height: 1.35)),
+          Text(isSignUp ? 'Rotanı kaydet, şehirleri keşfet, kendi seyahat hikâyeni oluştur.' : 'Bir sonraki rotanı kaldığın yerden keşfet.', maxLines: 2, style: const TextStyle(color: Colors.white, fontSize: 13, height: 1.35, fontWeight: FontWeight.w600)),
           const SizedBox(height: 11),
           Wrap(spacing: 7, children: const [
             _TravelPill(icon: Icons.location_on_rounded, text: 'Şehirler'),
@@ -400,17 +421,66 @@ class _Bubble extends StatelessWidget {
 
 class _ModeSwitcher extends StatelessWidget {
   const _ModeSwitcher({required this.isSignUp, required this.onChanged});
-  final bool isSignUp; final ValueChanged<bool>? onChanged;
+  final bool isSignUp;
+  final ValueChanged<bool>? onChanged;
+
   @override
-  Widget build(BuildContext context) => Row(children: [
-    Expanded(child: _ModeItem(label: context.l10n.text('signIn'), selected: !isSignUp, onTap: onChanged == null ? null : () => onChanged!(false))),
-    Expanded(child: _ModeItem(label: context.l10n.text('createAccount'), selected: isSignUp, onTap: onChanged == null ? null : () => onChanged!(true))),
-  ]);
+  Widget build(BuildContext context) => Row(
+    children: [
+      Expanded(
+        child: _ModeItem(
+          label: context.l10n.text('signIn'),
+          selected: !isSignUp,
+          onTap: onChanged == null ? null : () => onChanged!(false),
+        ),
+      ),
+      const SizedBox(width: 12),
+      Expanded(
+        child: _ModeItem(
+          label: context.l10n.text('createAccount'),
+          selected: isSignUp,
+          onTap: onChanged == null ? null : () => onChanged!(true),
+        ),
+      ),
+    ],
+  );
 }
 
 class _ModeItem extends StatelessWidget {
   const _ModeItem({required this.label, required this.selected, required this.onTap});
-  final String label; final bool selected; final VoidCallback? onTap;
+  final String label;
+  final bool selected;
+  final VoidCallback? onTap;
+
   @override
-  Widget build(BuildContext context) => Material(color: selected ? AppColors.darkNavy : Colors.transparent, borderRadius: BorderRadius.circular(17), child: InkWell(onTap: onTap, borderRadius: BorderRadius.circular(17), child: Padding(padding: const EdgeInsets.symmetric(vertical: 13), child: Center(child: Text(label, style: TextStyle(color: selected ? Colors.white : Colors.black, fontWeight: FontWeight.w900))))));
+  Widget build(BuildContext context) => SizedBox(
+    height: 58,
+    child: Material(
+      color: selected ? AppColors.primaryDark : AppColors.surface,
+      borderRadius: BorderRadius.circular(17),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(17),
+        child: Container(
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(17),
+            border: Border.all(
+              color: selected ? AppColors.primaryDark : AppColors.surface,
+              width: 1.5,
+            ),
+          ),
+          child: Text(
+            label,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: selected ? Colors.white : Colors.black,
+              fontWeight: FontWeight.w900,
+              fontSize: 16,
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
 }
