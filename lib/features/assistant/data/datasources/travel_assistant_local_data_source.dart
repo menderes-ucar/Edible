@@ -5,6 +5,8 @@ import '../../../food/domain/entities/food_details.dart';
 import '../../../food/domain/repositories/food_repository.dart';
 import '../../domain/entities/travel_assistant_request.dart';
 import '../../domain/entities/travel_assistant_response.dart';
+import '../assistant_local_strings.dart';
+import '../assistant_text_utils.dart';
 
 class TravelAssistantLocalDataSource {
   TravelAssistantLocalDataSource({
@@ -27,12 +29,12 @@ class TravelAssistantLocalDataSource {
     );
 
     if (all.isEmpty) {
-      return const TravelAssistantResponse(
-        summary: 'No discovery data is available yet.',
+      return TravelAssistantResponse(
+        summary: AssistantLocalStrings.text(request.languageCode, 'noData'),
         cityName: '',
         hours: 0,
-        stops: [],
-        tips: [],
+        stops: const [],
+        tips: const [],
       );
     }
 
@@ -44,22 +46,10 @@ class TravelAssistantLocalDataSource {
     );
 
     final hours = _resolveHours(message);
-    final wantsCheap = _containsAny(
-      message,
-      ['cheap', 'budget', 'ucuz', 'ekonomik'],
-    );
-    final wantsFood = _containsAny(
-      message,
-      ['food', 'eat', 'restaurant', 'yemek', 'ye', 'tat', 'ramen'],
-    );
-    final wantsCulture = _containsAny(
-      message,
-      ['culture', 'historic', 'history', 'museum', 'kültür', 'tarih', 'müze'],
-    );
-    final wantsLowWalking = _containsAny(
-      message,
-      ['less walking', 'low walking', 'az yürü', 'çok yürümek istemiyorum'],
-    );
+    final wantsCheap = AssistantTextUtils.wantsCheap(message);
+    final wantsFood = AssistantTextUtils.wantsFood(message);
+    final wantsCulture = AssistantTextUtils.wantsCulture(message);
+    final wantsLowWalking = AssistantTextUtils.wantsLowWalking(message);
 
     final cityItems = all
         .where(
@@ -122,6 +112,7 @@ class TravelAssistantLocalDataSource {
         reason: _reasonFor(
           content,
           foodDetails[content.id],
+          languageCode: request.languageCode,
           wantsCheap: wantsCheap,
           wantsFood: wantsFood,
           wantsCulture: wantsCulture,
@@ -131,10 +122,10 @@ class TravelAssistantLocalDataSource {
 
     final tips = <String>[];
     if (wantsLowWalking) {
-      tips.add('Keep stops in the same area and use public transport between clusters.');
+      tips.add(AssistantLocalStrings.text(request.languageCode, 'tipLowWalking'));
     }
     if (wantsCheap) {
-      tips.add('Prefer local casual food and markets over tourist-heavy areas.');
+      tips.add(AssistantLocalStrings.text(request.languageCode, 'tipCheap'));
     }
 
     if (cityName.isNotEmpty && chosen.isNotEmpty) {
@@ -162,6 +153,7 @@ class TravelAssistantLocalDataSource {
 
     return TravelAssistantResponse(
       summary: _summary(
+        languageCode: request.languageCode,
         cityName: cityName,
         hours: hours,
         wantsFood: wantsFood,
@@ -193,21 +185,7 @@ class TravelAssistantLocalDataSource {
     return cities.isNotEmpty ? cities.first : '';
   }
 
-  int _resolveHours(String message) {
-    final match = RegExp(r'(\d{1,2})\s*(hour|hours|saat)')
-        .firstMatch(message);
-
-    if (match != null) {
-      final value = int.tryParse(match.group(1) ?? '');
-      if (value != null) return value.clamp(2, 12);
-    }
-
-    return 4;
-  }
-
-  bool _containsAny(String message, List<String> values) {
-    return values.any(message.contains);
-  }
+  int _resolveHours(String message) => AssistantTextUtils.resolveHours(message);
 
   int _score(
     ExploreContent item,
@@ -245,6 +223,7 @@ class TravelAssistantLocalDataSource {
   String _reasonFor(
     ExploreContent item,
     FoodDetails? food, {
+    required String languageCode,
     required bool wantsCheap,
     required bool wantsFood,
     required bool wantsCulture,
@@ -257,34 +236,41 @@ class TravelAssistantLocalDataSource {
             category == 'fruit' ||
             category == 'drink')) {
       if (wantsCheap && food?.currencyCode != null) {
-        return 'Matches your food and budget preference.';
+        return AssistantLocalStrings.text(languageCode, 'reasonFoodBudget');
       }
-      return 'Matches your local food preference.';
+      return AssistantLocalStrings.text(languageCode, 'reasonFood');
     }
 
     if (wantsCulture &&
         (category == 'culture' || category == 'place')) {
-      return 'Matches your culture/history preference.';
+      return AssistantLocalStrings.text(languageCode, 'reasonCulture');
     }
 
-    return item.isFeatured
-        ? 'One of Edible’s highlighted discoveries.'
-        : 'A useful stop that fits the available time.';
+    return AssistantLocalStrings.text(
+      languageCode,
+      item.isFeatured ? 'reasonFeatured' : 'reasonFits',
+    );
   }
 
   String _summary({
+    required String languageCode,
     required String cityName,
     required int hours,
     required bool wantsFood,
     required bool wantsCulture,
   }) {
-    final goals = <String>[
-      if (wantsCulture) 'culture',
-      if (wantsFood) 'local food',
-    ];
+    final key = wantsFood && wantsCulture
+        ? 'summaryFoodCulture'
+        : wantsFood
+            ? 'summaryFood'
+            : wantsCulture
+                ? 'summaryCulture'
+                : 'summaryBalanced';
 
-    final focus = goals.isEmpty ? 'balanced discovery' : goals.join(' + ');
-
-    return '$hours-hour $focus plan for $cityName.';
+    return AssistantLocalStrings.text(
+      languageCode,
+      key,
+      args: {'hours': '$hours', 'city': cityName},
+    );
   }
 }

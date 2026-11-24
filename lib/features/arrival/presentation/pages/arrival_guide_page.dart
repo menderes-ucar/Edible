@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../../../core/error/app_error_presenter.dart';
 
 import '../../../../core/localization/app_localizations.dart';
+import '../../../pronunciation/presentation/widgets/speak_button.dart';
 import '../providers/arrival_guide_provider.dart';
 
 class ArrivalGuidePage extends StatefulWidget {
@@ -125,6 +126,10 @@ class _ArrivalGuidePageState extends State<ArrivalGuidePage> {
                                 subtitle: Text(
                                   '${phrase.pronunciation}\n'
                                   '${phrase.translation}',
+                                ),
+                                trailing: SpeakButton(
+                                  text: phrase.local,
+                                  countryCode: guide.countryCode,
                                 ),
                               ),
                             ),

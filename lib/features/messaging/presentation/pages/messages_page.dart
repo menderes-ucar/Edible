@@ -132,7 +132,7 @@ class _ChatPageState extends State<ChatPage> {
   late Future<String> _conversationFuture;
   bool _sending = false;
   bool _blocked = false;
-  String _name = 'Edible kullanıcısı';
+  String? _name;
   String? _avatar;
   List<DirectMessage> _messages = const [];
 
@@ -251,7 +251,7 @@ class _ChatPageState extends State<ChatPage> {
     return Scaffold(
       appBar: AppBar(
         titleSpacing: 0,
-        title: Row(children: [_Avatar(url: _avatar, radius: 18), const SizedBox(width: 10), Expanded(child: Text(_name, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w800)))]),
+        title: Row(children: [_Avatar(url: _avatar, radius: 18), const SizedBox(width: 10), Expanded(child: Text(_name ?? context.l10n.text('appUser'), overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w800)))]),
         actions: [IconButton(onPressed: _safetyMenu, icon: const Icon(Icons.more_vert_rounded))],
       ),
       body: FutureBuilder<String>(

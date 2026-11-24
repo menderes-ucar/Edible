@@ -1,4 +1,5 @@
 import '../../domain/entities/content_progress.dart';
+import '../../domain/entities/discovery_event.dart';
 import '../../domain/entities/trip_collection.dart';
 import '../../domain/repositories/progress_repository.dart';
 import '../datasources/progress_remote_data_source.dart';
@@ -18,6 +19,11 @@ class ProgressRepositoryImpl implements ProgressRepository {
   @override
   Future<Set<String>> getTriedIds() {
     return _remote.getIds(ContentProgressType.tried);
+  }
+
+  @override
+  Future<List<DiscoveryEvent>> getDiscoveryEvents() {
+    return _remote.getDiscoveryEvents();
   }
 
   @override

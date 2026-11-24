@@ -154,6 +154,33 @@ class CommunityService {
     }
   }
 
+  /// Reports a post. The server hides it for the reporter immediately and
+  /// auto-hides it for everyone after several distinct reports.
+  Future<void> reportPost({
+    required String postId,
+    required String reason,
+    String? details,
+  }) async {
+    final client = _client;
+    if (client == null) throw StateError('Supabase bağlantısı hazır değil.');
+    await client.rpc('report_community_post', params: {
+      'p_post_id': postId,
+      'p_reason': reason,
+      'p_details': details,
+    });
+  }
+
+  /// Blocks a user (shared with direct messaging). Their posts disappear from
+  /// the feed and they can no longer message the blocker.
+  Future<void> blockUser(String userId) async {
+    final client = _client;
+    if (client == null) throw StateError('Supabase bağlantısı hazır değil.');
+    await client.rpc('set_user_block', params: {
+      'p_other_user_id': userId,
+      'p_blocked': true,
+    });
+  }
+
   Future<void> react({
     required String postId,
     required String userId,

@@ -39,6 +39,29 @@ abstract final class AppRoutes {
   static const savedTripDetail = '/trip';
   static const savedTripItinerary = '/trip-itinerary';
   static const savedTripItineraryMap = '/trip-itinerary-map';
+  static const dietaryProfile = '/food-profile';
+  static const waiterCard = '/waiter-card';
+  static const currencyConverter = '/currency';
+  static const invite = '/invite';
+  static const suggestPlace = '/suggest-place';
+
+  static String suggestPlaceFor({String? city}) {
+    final value = city?.trim() ?? '';
+    if (value.isEmpty) return suggestPlace;
+    return '$suggestPlace?city=${Uri.encodeQueryComponent(value)}';
+  }
+
+  static String currencyConverterFor({String? countryCode}) {
+    final code = countryCode?.trim() ?? '';
+    if (code.isEmpty) return currencyConverter;
+    return '$currencyConverter?country=${Uri.encodeQueryComponent(code)}';
+  }
+
+  static String waiterCardFor({String? languageCode}) {
+    final code = languageCode?.trim() ?? '';
+    if (code.isEmpty) return waiterCard;
+    return '$waiterCard?lang=${Uri.encodeQueryComponent(code)}';
+  }
 
   static String tourDetailFor(String packageId) =>
       '$tourDetail/${Uri.encodeComponent(packageId)}';

@@ -44,6 +44,15 @@ class _ToursPageState extends State<ToursPage> {
   }
 
   Future<void> _load() async {
+    // Önce yerel katalogla hemen göster, sonra puanları ekle.
+    if (_packages == null) {
+      try {
+        final local = _repository.getLocalPackages();
+        if (mounted) setState(() => _packages = local);
+      } catch (_) {
+        if (mounted) setState(() => _packages = const []);
+      }
+    }
     final packages = await _repository.getPackages();
     if (!mounted) return;
     setState(() => _packages = packages);

@@ -18,6 +18,19 @@ typedef CheckInDistanceCalculator = double Function({
 });
 
 class VerifyCheckIn {
+  /// Radius when the stored pin is the real, verified location.
+  static const exactRadiusMeters = 200.0;
+
+  /// Radius when the pin is only a city-area approximation. Audited catalog
+  /// pins can be several kilometres from the real landmark, so a 200 m rule
+  /// would reject genuine visitors standing at the place. This only confirms
+  /// the user is in the right part of the city; it tightens automatically once
+  /// an item is marked `coordinatePrecision: exact`.
+  static const cityAreaRadiusMeters = 10000.0;
+
+  static double radiusFor({required bool hasExactCoordinates}) =>
+      hasExactCoordinates ? exactRadiusMeters : cityAreaRadiusMeters;
+
   const VerifyCheckIn({
     required CheckInDistanceCalculator distanceCalculator,
   }) : _distanceCalculator = distanceCalculator;

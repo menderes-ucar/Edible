@@ -6,6 +6,8 @@ import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/localization/app_language.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/config/legal_config.dart';
+import '../../../../core/widgets/legal_links.dart';
 import '../../../auth/domain/entities/app_user.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../settings/presentation/providers/locale_provider.dart';
@@ -65,6 +67,30 @@ class ProfilePage extends StatelessWidget {
                     ),
                     const SizedBox(height: 9),
                     _ActionTile(
+                      icon: Icons.add_location_alt_rounded,
+                      color: AppColors.freshGreen,
+                      title: context.l10n.text('suggestPlaceTitle'),
+                      subtitle: context.l10n.text('suggestPlaceSubtitle'),
+                      onTap: () => context.push(AppRoutes.suggestPlace),
+                    ),
+                    const SizedBox(height: 9),
+                    _ActionTile(
+                      icon: Icons.card_giftcard_rounded,
+                      color: AppColors.orange,
+                      title: context.l10n.text('referralTitle'),
+                      subtitle: context.l10n.text('referralSubtitle'),
+                      onTap: () => context.push(AppRoutes.invite),
+                    ),
+                    const SizedBox(height: 9),
+                    _ActionTile(
+                      icon: Icons.no_food_rounded,
+                      color: AppColors.freshGreen,
+                      title: context.l10n.text('dietaryProfile'),
+                      subtitle: context.l10n.text('dietaryProfileSubtitle'),
+                      onTap: () => context.push(AppRoutes.dietaryProfile),
+                    ),
+                    const SizedBox(height: 9),
+                    _ActionTile(
                       icon: Icons.luggage_rounded,
                       color: AppColors.orange,
                       title: context.l10n.text('myTrips'),
@@ -84,12 +110,18 @@ class ProfilePage extends StatelessWidget {
                     const SizedBox(height: 9),
                     _LanguageTile(localeProvider: localeProvider),
                     const SizedBox(height: 18),
+                    if (LegalConfig.hasAny) ...[
+                      _SectionLabel(text: context.l10n.text('legalSection')),
+                      const SizedBox(height: 4),
+                      const LegalLinks(alignment: WrapAlignment.start),
+                      const SizedBox(height: 14),
+                    ],
                     if (!auth.isGuest) ...[
                       _ActionTile(
                         icon: Icons.logout_rounded,
                         color: AppColors.error,
                         title: context.l10n.text('signOut'),
-                        subtitle: 'Hesabından güvenli şekilde çıkış yap',
+                        subtitle: context.l10n.text('signOutSubtitle'),
                         showArrow: false,
                         onTap: auth.isLoading ? null : () async {
                           final ok = await auth.signOut();
@@ -103,8 +135,8 @@ class ProfilePage extends StatelessWidget {
                       _ActionTile(
                         icon: Icons.delete_forever_rounded,
                         color: AppColors.error,
-                        title: 'Hesabı sil',
-                        subtitle: 'Hesabını ve kişisel verilerini kalıcı olarak sil',
+                        title: context.l10n.text('deleteAccount'),
+                        subtitle: context.l10n.text('deleteAccountSubtitle'),
                         showArrow: false,
                         onTap: auth.isLoading ? null : () => _confirmDeleteAccount(context, auth),
                       ),
@@ -125,19 +157,17 @@ Future<void> _confirmDeleteAccount(BuildContext context, AuthProvider auth) asyn
   final confirmed = await showDialog<bool>(
     context: context,
     builder: (dialogContext) => AlertDialog(
-      title: const Text('Hesabı sil?'),
-      content: const Text(
-        'Bu işlem hesabını, profil bilgilerini ve Edible üzerindeki kişisel verilerini kalıcı olarak siler. Bu işlem geri alınamaz.',
-      ),
+      title: Text(dialogContext.l10n.text('deleteAccountTitle')),
+      content: Text(dialogContext.l10n.text('deleteAccountMessage')),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(dialogContext).pop(false),
-          child: const Text('Vazgeç'),
+          child: Text(dialogContext.l10n.text('cancel')),
         ),
         FilledButton(
           style: FilledButton.styleFrom(backgroundColor: AppColors.error),
           onPressed: () => Navigator.of(dialogContext).pop(true),
-          child: const Text('Hesabı sil'),
+          child: Text(dialogContext.l10n.text('deleteAccount')),
         ),
       ],
     ),
@@ -152,7 +182,7 @@ Future<void> _confirmDeleteAccount(BuildContext context, AuthProvider auth) asyn
     return;
   }
   ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(content: Text(auth.errorMessage ?? 'Hesap silinemedi. Lütfen tekrar deneyin.')),
+    SnackBar(content: Text(auth.errorMessage ?? context.l10n.text('deleteAccountFailed'))),
   );
 }
 
@@ -248,11 +278,11 @@ class _PersonalInfo extends StatelessWidget {
   const _PersonalInfo({required this.user});
   final AppUser user;
 
-  String _gender(String? value) => switch (value) {
-    'female' => 'Kadın',
-    'male' => 'Erkek',
-    'non_binary' => 'Non-binary',
-    'prefer_not_to_say' => 'Belirtmek istemiyorum',
+  String _gender(BuildContext context, String? value) => switch (value) {
+    'female' => context.l10n.text('female'),
+    'male' => context.l10n.text('male'),
+    'non_binary' => context.l10n.text('nonBinary'),
+    'prefer_not_to_say' => context.l10n.text('preferNotToSay'),
     _ => value?.trim().isNotEmpty == true ? value! : '-',
   };
 
@@ -276,20 +306,20 @@ class _PersonalInfo extends StatelessWidget {
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(context.l10n.text('personalInfo'), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: AppColors.textPrimary)),
             const SizedBox(height: 2),
-            const Text('Profil bilgilerin', style: TextStyle(fontSize: 11, color: AppColors.textMuted, fontWeight: FontWeight.w600)),
+            Text(context.l10n.text('personalInfoSubtitle'), style: const TextStyle(fontSize: 11, color: AppColors.textMuted, fontWeight: FontWeight.w600)),
           ])),
         ]),
         const SizedBox(height: 14),
         Row(children: [
-          Expanded(child: _InfoCell(icon: Icons.person_outline_rounded, label: 'Ad Soyad', value: name.isEmpty ? '-' : name)),
+          Expanded(child: _InfoCell(icon: Icons.person_outline_rounded, label: context.l10n.text('fullName'), value: name.isEmpty ? '-' : name)),
           const SizedBox(width: 9),
-          Expanded(child: _InfoCell(icon: Icons.cake_outlined, label: 'Yaş', value: user.age?.toString() ?? '-')),
+          Expanded(child: _InfoCell(icon: Icons.cake_outlined, label: context.l10n.text('age'), value: user.age?.toString() ?? '-')),
         ]),
         const SizedBox(height: 9),
         Row(children: [
-          Expanded(child: _InfoCell(icon: Icons.location_on_outlined, label: 'Nereli', value: user.hometown?.trim().isNotEmpty == true ? user.hometown!.trim() : '-')),
+          Expanded(child: _InfoCell(icon: Icons.location_on_outlined, label: context.l10n.text('hometownLabel'), value: user.hometown?.trim().isNotEmpty == true ? user.hometown!.trim() : '-')),
           const SizedBox(width: 9),
-          Expanded(child: _InfoCell(icon: Icons.wc_outlined, label: 'Cinsiyet', value: _gender(user.gender))),
+          Expanded(child: _InfoCell(icon: Icons.wc_outlined, label: context.l10n.text('gender'), value: _gender(context, user.gender))),
         ]),
       ]),
     );
@@ -355,7 +385,7 @@ class _LanguageTile extends StatelessWidget {
         Container(width: 49, height: 49, decoration: BoxDecoration(gradient: AppColors.gradientBrand, borderRadius: BorderRadius.circular(17)), child: const Icon(Icons.translate_rounded, color: Colors.white)),
         const SizedBox(width: 12),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(context.l10n.text('language'), style: const TextStyle(fontSize: 11, color: Colors.black, fontWeight: FontWeight.w700)), Text(current?.nativeName ?? localeProvider.locale.languageCode.toUpperCase(), style: const TextStyle(fontWeight: FontWeight.w900, color: Colors.black))])),
-        DropdownButtonHideUnderline(child: DropdownButton<String>(value: localeProvider.locale.languageCode, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w900), icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.black), borderRadius: BorderRadius.circular(16), items: LocaleProvider.availableLocales.map((locale) { final language = AppLanguage.fromCode(locale.languageCode); return DropdownMenuItem(value: locale.languageCode, child: Text(language?.nativeName ?? locale.languageCode.toUpperCase())); }).toList(), onChanged: (value) { if (value != null) localeProvider.setLocale(Locale(value)); })),
+        DropdownButtonHideUnderline(child: DropdownButton<String>(value: localeProvider.locale.languageCode, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w900), icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.black), selectedItemBuilder: (_) => LocaleProvider.availableLocales.map((locale) => Align(alignment: AlignmentDirectional.centerEnd, child: Text(AppLanguage.fromCode(locale.languageCode)?.nativeName ?? locale.languageCode.toUpperCase()))).toList(), borderRadius: BorderRadius.circular(16), items: LocaleProvider.availableLocales.map((locale) { final language = AppLanguage.fromCode(locale.languageCode); return DropdownMenuItem(value: locale.languageCode, child: Text(language?.label(localeProvider.locale.languageCode) ?? locale.languageCode.toUpperCase())); }).toList(), onChanged: (value) { if (value != null) localeProvider.setLocale(Locale(value)); })),
       ]),
     );
   }

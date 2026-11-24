@@ -1,9 +1,13 @@
 import '../entities/content_progress.dart';
+import '../entities/discovery_event.dart';
 import '../entities/trip_collection.dart';
 
 abstract interface class ProgressRepository {
   Future<Set<String>> getVisitedIds();
   Future<Set<String>> getTriedIds();
+
+  /// First time each discovery was marked visited/tried (newest data first).
+  Future<List<DiscoveryEvent>> getDiscoveryEvents();
 
   Future<void> setProgress({
     required String contentId,

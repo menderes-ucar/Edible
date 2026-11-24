@@ -6,6 +6,8 @@ import 'release_localization_overrides.dart';
 import 'app_language.dart';
 import 'extended_localization_overrides.dart';
 import 'hardcoded_ui_localization_overrides.dart';
+import 'complete_localization_overrides.dart';
+import 'safety_localization_overrides.dart';
 
 class AppLocalizations {
   AppLocalizations(this.locale);
@@ -708,12 +710,17 @@ class AppLocalizations {
     final extended = extendedLocalizationOverrides[languageCode];
     final overrides = releaseLocalizationOverrides[languageCode];
     final englishOverrides = releaseLocalizationOverrides['en'];
+    final safety = safetyLocalizationOverrides[languageCode];
+    final complete = completeLocalizationOverrides[languageCode];
 
     return hardcoded?[key] ??
         extended?[key] ??
         overrides?[key] ??
         language?[key] ??
+        safety?[key] ??
+        complete?[key] ??
         englishOverrides?[key] ??
+        safetyLocalizationOverrides['en']?[key] ??
         _values['en']?[key] ??
         key;
   }
@@ -725,6 +732,8 @@ class AppLocalizations {
     return hardcodedUiLocalizationOverrides[languageCode]?.containsKey(key) == true ||
         extendedLocalizationOverrides[languageCode]?.containsKey(key) == true ||
         releaseLocalizationOverrides[languageCode]?.containsKey(key) == true ||
+        safetyLocalizationOverrides[languageCode]?.containsKey(key) == true ||
+        completeLocalizationOverrides[languageCode]?.containsKey(key) == true ||
         _values[languageCode]?.containsKey(key) == true;
   }
 }

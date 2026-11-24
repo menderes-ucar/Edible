@@ -445,7 +445,7 @@ class _RouteInfoCard extends StatelessWidget {
                             ),
                           ),
                           Tooltip(
-                            message: RoutingConfig.hasApiKey
+                            message: RoutingConfig.isProductionProvider
                                 ? context.l10n.text('configuredRoutingProvider')
                                 : context.l10n.text('developmentRoutingProvider'),
                             child: const Icon(

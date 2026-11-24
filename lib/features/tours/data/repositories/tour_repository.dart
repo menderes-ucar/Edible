@@ -12,20 +12,28 @@ class TourRepository {
   final TourLocalDataSource _local;
   final TourRemoteDataSource _remote;
 
+  /// Yerel katalog: ağ beklemeden anında döner.
+  List<TourPackage> getLocalPackages() => _local.getPackages();
+
+  /// Yerel katalog + puan/favori sayıları. Tek sorgu, zaman aşımı ve hata
+  /// durumunda yerel liste döner (sayfa asla yüklenmiş halde takılmaz).
   Future<List<TourPackage>> getPackages() async {
     final packages = _local.getPackages();
-    return Future.wait(packages.map((package) async {
-      try {
-        final stats = await _remote.summary(package.id);
+    try {
+      final stats =
+          await _remote.allSummaries().timeout(const Duration(seconds: 8));
+      return packages.map((package) {
+        final s = stats[package.id];
+        if (s == null) return package;
         return package.copyWithRatings(
-          ratingAverage: stats.average,
-          ratingCount: stats.count,
-          favoriteCount: stats.favoriteCount,
+          ratingAverage: s.average,
+          ratingCount: s.count,
+          favoriteCount: s.favoriteCount,
         );
-      } catch (_) {
-        return package;
-      }
-    }));
+      }).toList();
+    } catch (_) {
+      return packages;
+    }
   }
 
   Future<TourUserState> userState(String id) => _remote.userState(id);

@@ -12,10 +12,13 @@ import '../../../explore/domain/repositories/explore_repository.dart';
 import '../../../travel_history/domain/entities/travel_visit.dart';
 import '../../../travel_history/presentation/providers/travel_history_provider.dart';
 import '../../../travel_share/presentation/services/travel_card_share_service.dart';
+import '../../../travel_share/presentation/services/travel_share_caption.dart';
+import '../../../travel_share/presentation/widgets/travel_share_format_sheet.dart';
 import '../../../travel_share/presentation/widgets/passport_share_card_widget.dart';
 import '../../domain/entities/travel_badge.dart';
 import '../../domain/usecases/calculate_discovery_progress.dart';
 import '../providers/progress_provider.dart';
+import '../widgets/weekly_goal_card.dart';
 
 class PassportPage extends StatefulWidget {
   const PassportPage({super.key});
@@ -74,6 +77,11 @@ class _PassportPageState extends State<PassportPage> {
       return;
     }
 
+    final format = await showTravelShareFormatSheet(context);
+    if (format == null || !mounted || _isSharing) {
+      return;
+    }
+
     final boundary = _passportShareKey.currentContext?.findRenderObject();
     if (boundary is! RenderRepaintBoundary) {
       return;
@@ -85,7 +93,11 @@ class _PassportPageState extends State<PassportPage> {
       await const TravelCardShareService().shareBoundary(
         boundary: boundary,
         fileName: 'edible_passport',
-        shareText: 'My Edible Passport',
+        shareText: TravelShareCaption.withLink(
+          context,
+          context.l10n.text('sharePassportCaption'),
+        ),
+        format: format,
       );
     } catch (error) {
       if (!mounted) {
@@ -297,6 +309,8 @@ class _PassportPageState extends State<PassportPage> {
               total: worldStats.total,
               percent: worldStats.percent,
             ),
+            const SizedBox(height: 14),
+            const WeeklyGoalCard(),
             const SizedBox(height: 26),
             _SectionTitle(
               title: context.l10n.text('badges'),

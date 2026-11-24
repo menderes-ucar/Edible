@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../../../../core/error/app_error_presenter.dart';
 import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/router/app_routes.dart';
+import '../../../../core/widgets/legal_links.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../domain/entities/purchase_option.dart';
 import '../providers/purchase_provider.dart';
@@ -252,6 +253,7 @@ class _PaywallPageState extends State<PaywallPage> {
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.bodySmall,
           ),
+          const LegalLinks(),
         ],
       ),
     );
@@ -269,8 +271,44 @@ class _PurchaseCard extends StatelessWidget {
   final bool disabled;
   final VoidCallback onPressed;
 
+  String _title(BuildContext context) => switch (option.period) {
+        PurchasePeriod.annual => context.l10n.text('paywallPeriodAnnual'),
+        PurchasePeriod.monthly => context.l10n.text('paywallPeriodMonthly'),
+        PurchasePeriod.weekly => context.l10n.text('paywallPeriodWeekly'),
+        PurchasePeriod.other => option.title,
+      };
+
+  String? _trialLine(BuildContext context) {
+    if (option.trialDays != null) {
+      return context.l10n
+          .text('paywallTrialDays')
+          .replaceAll('{days}', '${option.trialDays}');
+    }
+    if (option.trialMonths != null) {
+      return context.l10n
+          .text('paywallTrialMonths')
+          .replaceAll('{months}', '${option.trialMonths}');
+    }
+    return null;
+  }
+
+  String? _perMonthLine(BuildContext context) {
+    final monthly = option.monthlyEquivalent;
+    if (monthly == null) return null;
+    final code = option.currencyCode;
+    final amount = monthly.toStringAsFixed(2);
+    return context.l10n
+        .text('paywallPerMonth')
+        .replaceAll('{price}', code == null ? amount : '$code $amount');
+  }
+
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final trial = _trialLine(context);
+    final perMonth = _perMonthLine(context);
+    final savings = option.savingsPercent;
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -280,12 +318,43 @@ class _PurchaseCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    option.title,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w900,
+                  if (savings != null) ...[
+                    Wrap(
+                      spacing: 6,
+                      runSpacing: 6,
+                      children: [
+                        _Badge(
+                          label: context.l10n.text('paywallBestValue'),
+                          filled: true,
                         ),
+                        _Badge(
+                          label: context.l10n
+                              .text('paywallSavePercent')
+                              .replaceAll('{percent}', '$savings'),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                  ],
+                  Text(
+                    _title(context),
+                    style: textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w900,
+                    ),
                   ),
+                  if (perMonth != null) ...[
+                    const SizedBox(height: 2),
+                    Text(perMonth, style: textTheme.bodySmall),
+                  ],
+                  if (trial != null) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      trial,
+                      style: textTheme.bodySmall?.copyWith(
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 3),
                   Text(
                     option.description,
@@ -301,6 +370,33 @@ class _PurchaseCard extends StatelessWidget {
               child: Text(option.priceText),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _Badge extends StatelessWidget {
+  const _Badge({required this.label, this.filled = false});
+
+  final String label;
+  final bool filled;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+      decoration: BoxDecoration(
+        color: filled ? scheme.primary : scheme.primaryContainer,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 11.5,
+          fontWeight: FontWeight.w900,
+          color: filled ? scheme.onPrimary : scheme.onPrimaryContainer,
         ),
       ),
     );

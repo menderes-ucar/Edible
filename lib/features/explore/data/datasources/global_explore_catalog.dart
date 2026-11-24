@@ -6,6 +6,12 @@ const String globalExploreCatalogVersion = 'global_launch_v2';
 const int globalExploreLaunchCountryCount = 20;
 const int globalExploreLaunchCityCount = 100;
 
+/// The catalog derives one generic "Seasonal fruit from <country>" entry per
+/// city from the snack items (same stock photo, pin ~40 m from the snack).
+/// These are placeholders, not real discoveries. Set to false to hide them
+/// until real, verified fruit/market entries exist.
+const bool includeSyntheticFruitPlaceholders = true;
+
 /// Bundled launch catalog supplement.
 ///
 /// Existing rich Istanbul / Tokyo / Rome seed remains in ExploreLocalDataSource.
@@ -16,7 +22,8 @@ List<ExploreContentModel> getGlobalExploreCatalog(String languageCode) {
   return [
     ..._items.map((item) => item.toModel(locale)),
     ..._launchCityExpansionItems.map((item) => item.toModel(locale)),
-    ..._fruitItems.map((item) => item.toModel(locale)),
+    if (includeSyntheticFruitPlaceholders)
+      ..._fruitItems.map((item) => item.toModel(locale)),
   ];
 }
 

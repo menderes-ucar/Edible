@@ -40,7 +40,7 @@ class _SeedExploreItem {
       ExploreCategory.drink => tr ? 'Yerel içecek' : 'Local drink',
       ExploreCategory.fruit => tr ? 'Mevsimsel ürün' : 'Seasonal produce',
     };
-    final body = tr ? 'Harita, filtre, yakın çevre, Saved Trip ve itinerary akışlarını test etmek için hazırlanmış başlangıç içeriği.' : 'Starter content prepared to test map, filters, nearby, Saved Trip and itinerary flows.';
+    final body = tr ? 'Bu keşfin ayrıntıları editör ekibimiz tarafından doğrulanıyor.' : 'Details for this discovery are being verified by our editors.';
     return ExploreContentModel(id: id, countryCode: countryCode, countryName: tr ? countryTr : countryEn, cityName: tr ? cityTr : cityEn, category: category, title: tr ? titleTr : titleEn, shortDescription: short, description: body, latitude: latitude, longitude: longitude, coverImageUrl: coverImageUrl, tags: [category.value, cityEn.toLowerCase(), countryCode.toLowerCase()], metadata: metadata, galleryImageUrls: const [], isFeatured: isFeatured);
   }
 }

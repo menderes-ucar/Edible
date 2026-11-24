@@ -16,6 +16,7 @@ import 'features/arrival_detection/domain/repositories/arrival_detection_reposit
 import 'features/arrival_detection/domain/usecases/detect_arrival.dart';
 import 'features/arrival_detection/presentation/providers/arrival_detection_provider.dart';
 import 'features/assistant/data/datasources/travel_assistant_local_data_source.dart';
+import 'features/assistant/data/datasources/travel_assistant_remote_data_source.dart';
 import 'features/assistant/data/repositories/travel_assistant_repository_impl.dart';
 import 'features/assistant/domain/repositories/travel_assistant_repository.dart';
 import 'features/assistant/presentation/providers/travel_assistant_provider.dart';
@@ -40,6 +41,7 @@ import 'features/food/data/datasources/food_local_data_source.dart';
 import 'features/food/data/datasources/food_remote_data_source.dart';
 import 'features/food/data/repositories/food_repository_impl.dart';
 import 'features/food/domain/repositories/food_repository.dart';
+import 'features/food/presentation/providers/dietary_profile_provider.dart';
 import 'features/food/presentation/providers/food_filter_provider.dart';
 import 'features/location/domain/usecases/find_nearby_discoveries.dart';
 import 'features/notifications/data/notification_service.dart';
@@ -163,6 +165,10 @@ class EdibleApp extends StatelessWidget {
               exploreRepository: context.read<ExploreRepository>(),
               foodRepository: context.read<FoodRepository>(),
               cultureRepository: context.read<CultureRepository>(),
+            ),
+            remoteDataSource: TravelAssistantRemoteDataSource(
+              exploreRepository: context.read<ExploreRepository>(),
+              foodRepository: context.read<FoodRepository>(),
             ),
           ),
         ),
@@ -314,6 +320,9 @@ class EdibleApp extends StatelessWidget {
           create: (context) => FoodFilterProvider(
             repository: context.read<FoodRepository>(),
           ),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => DietaryProfileProvider(),
         ),
         ChangeNotifierProvider(
           create: (context) => CultureGuideProvider(

@@ -30,6 +30,18 @@ class _CommunityPageState extends State<CommunityPage> {
     _reload();
   }
 
+  bool? _wasAuthenticated;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final authed = context.watch<AuthProvider>().isAuthenticated;
+    if (_wasAuthenticated != null && _wasAuthenticated != authed && authed) {
+      _reload();
+    }
+    _wasAuthenticated = authed;
+  }
+
   void _reload() {
     _future = _service.feed();
   }
@@ -113,9 +125,132 @@ class _CommunityPageState extends State<CommunityPage> {
     }
   }
 
+  Future<void> _report(CommunityPost post) async {
+    final auth = context.read<AuthProvider>();
+    if (!auth.isAuthenticated) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.text('loginToReport'))),
+      );
+      context.push('/login?from=%2Fcommunity');
+      return;
+    }
+
+    final reasons = <String, String>{
+      'spam': context.l10n.text('reportReasonSpam'),
+      'inappropriate': context.l10n.text('reportReasonInappropriate'),
+      'harassment': context.l10n.text('reportReasonHarassment'),
+      'false_information': context.l10n.text('reportReasonFalse'),
+      'other': context.l10n.text('reportReasonOther'),
+    };
+
+    final reason = await showModalBottomSheet<String>(
+      context: context,
+      useSafeArea: true,
+      showDragHandle: true,
+      builder: (sheetContext) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+              child: Text(
+                sheetContext.l10n.text('reportPostTitle'),
+                style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800),
+              ),
+            ),
+            for (final entry in reasons.entries)
+              ListTile(
+                leading: const Icon(Icons.flag_outlined),
+                title: Text(entry.value),
+                onTap: () => Navigator.of(sheetContext).pop(entry.key),
+              ),
+          ],
+        ),
+      ),
+    );
+    if (reason == null || !mounted) return;
+
+    try {
+      await _service.reportPost(postId: post.id, reason: reason);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.text('postReported'))),
+      );
+      setState(_reload);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.l10n.text('operationFailedWithError').replaceAll('{error}', '$e'))),
+        );
+      }
+    }
+  }
+
+  Future<void> _block(CommunityPost post) async {
+    final auth = context.read<AuthProvider>();
+    if (!auth.isAuthenticated) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.text('loginToReport'))),
+      );
+      context.push('/login?from=%2Fcommunity');
+      return;
+    }
+
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(dialogContext.l10n.text('blockAuthorTitle')),
+        content: Text(dialogContext.l10n.text('blockAuthorMessage')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: Text(dialogContext.l10n.text('cancel')),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: Text(dialogContext.l10n.text('blockUser')),
+          ),
+        ],
+      ),
+    );
+    if (ok != true || !mounted) return;
+
+    try {
+      await _service.blockUser(post.userId);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.text('authorBlockedDone'))),
+      );
+      setState(_reload);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.l10n.text('operationFailedWithError').replaceAll('{error}', '$e'))),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
+    if (!auth.isAuthenticated) {
+      return Scaffold(
+        backgroundColor: const Color(0xFF2D2D2D),
+        appBar: AppBar(
+          title: Text(context.l10n.text('share'),
+              style: const TextStyle(fontWeight: FontWeight.w900)),
+          backgroundColor: Colors.transparent,
+        ),
+        body: Center(
+          child: FilledButton(
+            onPressed: () => context.push('/login?from=%2Fcommunity'),
+            child: Text(context.l10n.text('signIn')),
+          ),
+        ),
+      );
+    }
     return Scaffold(
       backgroundColor: const Color(0xFF2D2D2D),
       appBar: AppBar(
@@ -190,6 +325,8 @@ class _CommunityPageState extends State<CommunityPage> {
                   onLike: () => _react(post, 'like'),
                   onDislike: () => _react(post, 'dislike'),
                   onDelete: isMine ? () => _delete(post) : null,
+                  onReport: isMine ? null : () => _report(post),
+                  onBlock: isMine ? null : () => _block(post),
                 );
               },
             ),
@@ -208,6 +345,8 @@ class _PostCard extends StatelessWidget {
     required this.onLike,
     required this.onDislike,
     this.onDelete,
+    this.onReport,
+    this.onBlock,
   });
 
   final CommunityPost post;
@@ -216,6 +355,8 @@ class _PostCard extends StatelessWidget {
   final VoidCallback onLike;
   final VoidCallback onDislike;
   final VoidCallback? onDelete;
+  final VoidCallback? onReport;
+  final VoidCallback? onBlock;
 
   @override
   Widget build(BuildContext context) {
@@ -234,7 +375,7 @@ class _PostCard extends StatelessWidget {
               post.displayName,
               style: const TextStyle(fontWeight: FontWeight.w800),
             ),
-            subtitle: Text(_relative(post.createdAt)),
+            subtitle: Text(_relative(context, post.createdAt)),
             trailing: isMine
                 ? PopupMenuButton<String>(
                     onSelected: (_) => onDelete?.call(),
@@ -248,7 +389,29 @@ class _PostCard extends StatelessWidget {
                       ),
                     ],
                   )
-                : null,
+                : PopupMenuButton<String>(
+                    icon: const Icon(Icons.more_vert),
+                    onSelected: (value) {
+                      if (value == 'report') onReport?.call();
+                      if (value == 'block') onBlock?.call();
+                    },
+                    itemBuilder: (_) => [
+                      PopupMenuItem(
+                        value: 'report',
+                        child: ListTile(
+                          leading: const Icon(Icons.flag_outlined),
+                          title: Text(context.l10n.text('reportPost')),
+                        ),
+                      ),
+                      PopupMenuItem(
+                        value: 'block',
+                        child: ListTile(
+                          leading: const Icon(Icons.block_outlined),
+                          title: Text(context.l10n.text('blockAuthor')),
+                        ),
+                      ),
+                    ],
+                  ),
           ),
           if (images.isNotEmpty) _ImageStrip(urls: images),
           if (post.caption.trim().isNotEmpty)
@@ -300,12 +463,19 @@ class _PostCard extends StatelessWidget {
     );
   }
 
-  static String _relative(DateTime value) {
+  static String _relative(BuildContext context, DateTime value) {
     final d = DateTime.now().difference(value.toLocal());
-    if (d.inMinutes < 1) return 'Şimdi';
-    if (d.inHours < 1) return '${d.inMinutes} dk önce';
-    if (d.inDays < 1) return '${d.inHours} sa önce';
-    if (d.inDays < 7) return '${d.inDays} gün önce';
+    final l10n = context.l10n;
+    if (d.inMinutes < 1) return l10n.text('relNow');
+    if (d.inHours < 1) {
+      return l10n.text('relMinutesAgo').replaceAll('{n}', '${d.inMinutes}');
+    }
+    if (d.inDays < 1) {
+      return l10n.text('relHoursAgo').replaceAll('{n}', '${d.inHours}');
+    }
+    if (d.inDays < 7) {
+      return l10n.text('relDaysAgo').replaceAll('{n}', '${d.inDays}');
+    }
     return '${value.day.toString().padLeft(2, '0')}.${value.month.toString().padLeft(2, '0')}.${value.year}';
   }
 }
@@ -474,7 +644,7 @@ class _CreatePostSheetState extends State<_CreatePostSheet> {
   Future<void> _useLocation() async {
     try {
       if (!await Geolocator.isLocationServiceEnabled()) {
-        throw StateError('Konum servisi kapalı.');
+        throw StateError(context.l10n.text('locationServiceDisabled'));
       }
       var permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
@@ -608,7 +778,7 @@ class _CreatePostSheetState extends State<_CreatePostSheet> {
               maxLines: 4,
               maxLength: 2000,
               decoration:  InputDecoration(
-                labelText: 'Açıklama',
+                labelText: context.l10n.text('postCaption'),
                 hintText: context.l10n.text('communityCaptionHint'),
                 border: OutlineInputBorder(),
                 alignLabelWithHint: true,
@@ -618,7 +788,7 @@ class _CreatePostSheetState extends State<_CreatePostSheet> {
             TextField(
               controller: _location,
               decoration: InputDecoration(
-                labelText: 'Konum (isteğe bağlı)',
+                labelText: context.l10n.text('locationOptional'),
                 hintText: context.l10n.text('communityLocationHint'),
                 border: const OutlineInputBorder(),
                 prefixIcon: const Icon(Icons.location_on_outlined),

@@ -66,7 +66,7 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
     if (_signUpMode && (age == null || age < 13 || age > 120)) {
-      _showMessage('13–120 arası geçerli bir yaş gir.');
+      _showMessage(context.l10n.text('invalidAge'));
       return;
     }
     if (_signUpMode && hometown.isEmpty) {
@@ -199,66 +199,13 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _pickCountry() async {
-    final searchController = TextEditingController();
-    var filtered = List<CountryOption>.from(countryOptions);
     final selected = await showModalBottomSheet<CountryOption>(
       context: context,
       isScrollControlled: true,
+      useSafeArea: true,
       backgroundColor: Colors.transparent,
-      builder: (sheetContext) => StatefulBuilder(
-        builder: (context, setSheetState) => SafeArea(
-          child: Container(
-            height: MediaQuery.sizeOf(context).height * .78,
-            decoration: const BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-            ),
-            child: Column(
-              children: [
-                const SizedBox(height: 10),
-                Container(width: 42, height: 4, decoration: BoxDecoration(color: AppColors.surfaceDeep, borderRadius: BorderRadius.circular(99))),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(18, 18, 18, 10),
-                  child: TextField(
-                    controller: searchController,
-                    autofocus: true,
-                    onChanged: (query) => setSheetState(() {
-                      final q = query.trim().toLowerCase();
-                      filtered = countryOptions.where((country) => country.name.toLowerCase().contains(q) || country.code.toLowerCase().contains(q)).toList();
-                    }),
-                    decoration: InputDecoration(
-                      labelText: 'Ülke ara',
-                      prefixIcon: const Icon(Icons.search_rounded),
-                      suffixIcon: IconButton(onPressed: () => searchController.clear(), icon: const Icon(Icons.clear_rounded)),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: filtered.length,
-                    itemBuilder: (_, index) {
-                      final country = filtered[index];
-                      final isSelected = country.code == _selectedCountryCode;
-                      return ListTile(
-                        leading: CircleAvatar(
-                          radius: 18,
-                          backgroundColor: isSelected ? AppColors.primary : AppColors.surfaceDeep,
-                          child: Text(country.code, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, color: isSelected ? Colors.white : AppColors.textPrimary)),
-                        ),
-                        title: Text(country.name, style: const TextStyle(fontWeight: FontWeight.w800)),
-                        trailing: isSelected ? const Icon(Icons.check_circle_rounded, color: AppColors.primary) : null,
-                        onTap: () => Navigator.of(sheetContext).pop(country),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
+      builder: (_) => _CountryPickerSheet(selectedCode: _selectedCountryCode),
     );
-    searchController.dispose();
     if (!mounted || selected == null) return;
     setState(() {
       _selectedCountryCode = selected.code;
@@ -379,12 +326,12 @@ class _AuthTravelHero extends StatelessWidget {
         Positioned(left: 22, bottom: 22, right: 22, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(isSignUp ? l10n.text('joinEdible') : l10n.text('welcomeBackExplorer'), maxLines: 2, style: const TextStyle(color: Colors.white, fontSize: 27, height: 1.02, fontWeight: FontWeight.w900)),
           const SizedBox(height: 7),
-          Text(isSignUp ? 'Rotanı kaydet, şehirleri keşfet, kendi seyahat hikâyeni oluştur.' : 'Bir sonraki rotanı kaldığın yerden keşfet.', maxLines: 2, style: const TextStyle(color: Colors.white, fontSize: 13, height: 1.35, fontWeight: FontWeight.w600)),
+          Text(isSignUp ? l10n.text('authHeroSubtitleSignUp') : l10n.text('authHeroSubtitleSignIn'), maxLines: 2, style: const TextStyle(color: Colors.white, fontSize: 13, height: 1.35, fontWeight: FontWeight.w600)),
           const SizedBox(height: 11),
-          Wrap(spacing: 7, children: const [
-            _TravelPill(icon: Icons.location_on_rounded, text: 'Şehirler'),
-            _TravelPill(icon: Icons.restaurant_rounded, text: 'Lezzetler'),
-            _TravelPill(icon: Icons.map_rounded, text: 'Rotalar'),
+          Wrap(spacing: 7, children: [
+            _TravelPill(icon: Icons.location_on_rounded, text: l10n.text('heroCities')),
+            _TravelPill(icon: Icons.restaurant_rounded, text: l10n.text('heroFlavors')),
+            _TravelPill(icon: Icons.map_rounded, text: l10n.text('heroRoutes')),
           ]),
         ])),
       ]),
@@ -483,4 +430,115 @@ class _ModeItem extends StatelessWidget {
       ),
     ),
   );
+}
+
+
+/// Ülke seçici. Arama kontrolcüsünü kendi State'i yönetir; sheet kapanırken
+/// dışarıdan dispose edilmez (önceki hata: kapanış animasyonu sırasında
+/// controller/autofocus çakışması).
+class _CountryPickerSheet extends StatefulWidget {
+  const _CountryPickerSheet({required this.selectedCode});
+
+  final String? selectedCode;
+
+  @override
+  State<_CountryPickerSheet> createState() => _CountryPickerSheetState();
+}
+
+class _CountryPickerSheetState extends State<_CountryPickerSheet> {
+  final _controller = TextEditingController();
+  String _query = '';
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final q = _query.trim().toLowerCase();
+    final filtered = q.isEmpty
+        ? countryOptions
+        : countryOptions
+            .where((c) =>
+                c.name.toLowerCase().contains(q) ||
+                c.code.toLowerCase().contains(q))
+            .toList();
+
+    return Padding(
+      padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
+      child: Container(
+        height: MediaQuery.sizeOf(context).height * .7,
+        decoration: const BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        ),
+        child: Column(
+          children: [
+            const SizedBox(height: 10),
+            Container(
+              width: 42,
+              height: 4,
+              decoration: BoxDecoration(
+                color: AppColors.surfaceDeep,
+                borderRadius: BorderRadius.circular(99),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(18, 18, 18, 10),
+              child: TextField(
+                controller: _controller,
+                onChanged: (v) => setState(() => _query = v),
+                decoration: InputDecoration(
+                  labelText: context.l10n.text('searchCountry'),
+                  prefixIcon: const Icon(Icons.search_rounded),
+                  suffixIcon: _query.isEmpty
+                      ? null
+                      : IconButton(
+                          onPressed: () {
+                            _controller.clear();
+                            setState(() => _query = '');
+                          },
+                          icon: const Icon(Icons.clear_rounded),
+                        ),
+                ),
+              ),
+            ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: filtered.length,
+                itemBuilder: (_, index) {
+                  final country = filtered[index];
+                  final isSelected = country.code == widget.selectedCode;
+                  return ListTile(
+                    leading: CircleAvatar(
+                      radius: 18,
+                      backgroundColor:
+                          isSelected ? AppColors.primary : AppColors.surfaceDeep,
+                      child: Text(
+                        country.code,
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w900,
+                          color: isSelected ? Colors.white : AppColors.textPrimary,
+                        ),
+                      ),
+                    ),
+                    title: Text(country.name,
+                        style: const TextStyle(fontWeight: FontWeight.w800)),
+                    trailing: isSelected
+                        ? const Icon(Icons.check_circle_rounded,
+                            color: AppColors.primary)
+                        : null,
+                    onTap: () => Navigator.of(context).pop(country),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

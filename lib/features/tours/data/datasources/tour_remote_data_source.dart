@@ -35,6 +35,24 @@ class TourRemoteDataSource {
     );
   }
 
+  /// Tüm turların özetini TEK sorguda getirir (paket başına istek yok).
+  Future<Map<String, TourRatingSummary>> allSummaries() async {
+    final client = SupabaseService.client;
+    if (client == null) return const {};
+    final rows = await client.from('tour_package_stats').select();
+    final result = <String, TourRatingSummary>{};
+    for (final row in rows) {
+      final id = row['package_id']?.toString();
+      if (id == null) continue;
+      result[id] = TourRatingSummary(
+        (row['rating_average'] as num?)?.toDouble() ?? 0,
+        (row['rating_count'] as num?)?.toInt() ?? 0,
+        (row['favorite_count'] as num?)?.toInt() ?? 0,
+      );
+    }
+    return result;
+  }
+
   Future<TourUserState> userState(String packageId) async {
     final client = SupabaseService.client;
     final user = client?.auth.currentUser;

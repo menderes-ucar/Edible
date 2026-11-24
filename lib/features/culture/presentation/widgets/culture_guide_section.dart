@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/localization/app_localizations.dart';
+import '../../../pronunciation/presentation/widgets/speak_button.dart';
 import '../../domain/entities/culture_guide.dart';
 
 class CultureGuideSection extends StatelessWidget {
@@ -30,6 +31,7 @@ class CultureGuideSection extends StatelessWidget {
             _Section(
               type: entry.key,
               items: entry.value,
+              countryCode: guide.countryCode,
             ),
             const SizedBox(height: 18),
           ],
@@ -62,10 +64,12 @@ class _Section extends StatelessWidget {
   const _Section({
     required this.type,
     required this.items,
+    required this.countryCode,
   });
 
   final CultureTipType type;
   final List<CultureGuideItem> items;
+  final String countryCode;
 
   @override
   Widget build(BuildContext context) {
@@ -86,7 +90,7 @@ class _Section extends StatelessWidget {
           (item) => Padding(
             padding: const EdgeInsets.only(bottom: 8),
             child: item.isPhrase
-                ? _PhraseCard(item: item)
+                ? _PhraseCard(item: item, countryCode: countryCode)
                 : _CultureCard(
                     item: item,
                     icon: _icon(type),
@@ -168,9 +172,10 @@ class _CultureCard extends StatelessWidget {
 }
 
 class _PhraseCard extends StatelessWidget {
-  const _PhraseCard({required this.item});
+  const _PhraseCard({required this.item, required this.countryCode});
 
   final CultureGuideItem item;
+  final String countryCode;
 
   @override
   Widget build(BuildContext context) {
@@ -186,11 +191,18 @@ class _PhraseCard extends StatelessWidget {
             ),
             if (item.phraseLocal?.isNotEmpty == true) ...[
               const SizedBox(height: 8),
-              SelectableText(
-                item.phraseLocal!,
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w900,
+              Row(
+                children: [
+                  Expanded(
+                    child: SelectableText(
+                      item.phraseLocal!,
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.w900,
+                          ),
                     ),
+                  ),
+                  SpeakButton(text: item.phraseLocal!, countryCode: countryCode),
+                ],
               ),
             ],
             if (item.phrasePronunciation?.isNotEmpty == true) ...[

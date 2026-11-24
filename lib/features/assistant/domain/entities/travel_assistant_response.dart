@@ -12,6 +12,17 @@ class TravelAssistantStop {
   final String reason;
 }
 
+enum TravelAssistantSource {
+  /// Built by the AI service from Edible's catalog.
+  ai,
+
+  /// Built by the offline rule-based engine.
+  basic,
+
+  /// Offline engine used because today's AI quota is used up.
+  basicQuotaReached,
+}
+
 class TravelAssistantResponse {
   const TravelAssistantResponse({
     required this.summary,
@@ -19,6 +30,7 @@ class TravelAssistantResponse {
     required this.hours,
     required this.stops,
     required this.tips,
+    this.source = TravelAssistantSource.basic,
   });
 
   final String summary;
@@ -26,4 +38,16 @@ class TravelAssistantResponse {
   final int hours;
   final List<TravelAssistantStop> stops;
   final List<String> tips;
+  final TravelAssistantSource source;
+
+  TravelAssistantResponse withSource(TravelAssistantSource source) {
+    return TravelAssistantResponse(
+      summary: summary,
+      cityName: cityName,
+      hours: hours,
+      stops: stops,
+      tips: tips,
+      source: source,
+    );
+  }
 }

@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -9,7 +10,14 @@ class AppRuntimeGuard {
   AppRuntimeGuard._();
 
   static void install() {
-    FlutterError.onError = FlutterError.presentError;
+    final crashReportingEnabled = _configureCrashReporting();
+
+    FlutterError.onError = (details) {
+      FlutterError.presentError(details);
+      if (crashReportingEnabled) {
+        _record(details.exception, details.stack, fatal: true);
+      }
+    };
 
     PlatformDispatcher.instance.onError = (error, stack) {
       FlutterError.reportError(
@@ -19,12 +27,35 @@ class AppRuntimeGuard {
           library: 'Edible runtime',
         ),
       );
+      // FlutterError.reportError above already routes through
+      // FlutterError.onError, which records to Crashlytics once.
       return true;
     };
 
     ErrorWidget.builder = (details) {
       return _RuntimeErrorFallback(details: details);
     };
+  }
+}
+
+/// Crashlytics is optional infrastructure: it must never be the reason the
+/// app fails to start. Collection is disabled in debug/profile builds.
+bool _configureCrashReporting() {
+  try {
+    final enabled = kReleaseMode;
+    FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(enabled);
+    return enabled;
+  } catch (error) {
+    debugPrint('Crashlytics unavailable: $error');
+    return false;
+  }
+}
+
+void _record(Object error, StackTrace? stack, {required bool fatal}) {
+  try {
+    FirebaseCrashlytics.instance.recordError(error, stack, fatal: fatal);
+  } catch (_) {
+    // Reporting must never throw back into the error handler.
   }
 }
 

@@ -1,9 +1,14 @@
 class RoutingConfig {
   const RoutingConfig._();
 
+  /// Default: the FOSSGIS pedestrian OSRM instance. The public OSRM demo
+  /// server (router.project-osrm.org) only serves car profiles regardless of
+  /// the profile in the URL, which produced driving routes labelled "walking".
+  /// For heavy production traffic set ROUTING_BASE_URL to your own OSRM /
+  /// OpenRouteService / GraphHopper endpoint (see ROUTING_API_KEY).
   static const baseUrl = String.fromEnvironment(
     'ROUTING_BASE_URL',
-    defaultValue: 'https://router.project-osrm.org',
+    defaultValue: 'https://routing.openstreetmap.de/routed-foot',
   );
 
   static const profile = String.fromEnvironment(
@@ -32,4 +37,9 @@ class RoutingConfig {
   );
 
   static bool get hasApiKey => apiKey.trim().isNotEmpty;
+
+  /// True when routing runs on a dedicated provider (API key configured or a
+  /// non-demo endpoint). Only the car-only OSRM demo is flagged as development.
+  static bool get isProductionProvider =>
+      hasApiKey || !baseUrl.contains('router.project-osrm.org');
 }

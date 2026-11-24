@@ -7,6 +7,7 @@ import 'package:purchases_flutter/purchases_flutter.dart';
 import '../../../../core/config/revenuecat_config.dart';
 import '../../domain/entities/purchase_option.dart';
 import '../../domain/entities/subscription_entitlement.dart';
+import '../../domain/purchase_option_pricing.dart';
 
 class RevenueCatService {
   RevenueCatService();
@@ -78,10 +79,16 @@ class RevenueCatService {
 
     _packages.clear();
 
-    return current.availablePackages.map((package) {
+    final options = current.availablePackages.map((package) {
       final product = package.storeProduct;
       final key = package.identifier;
       _packages[key] = package;
+
+      // Only a genuinely free introductory offer is advertised as a trial.
+      final intro = product.introductoryPrice;
+      final trial = (intro != null && intro.price == 0)
+          ? parseTrialPeriod(intro.period, cycles: intro.cycles)
+          : null;
 
       return PurchaseOption(
         id: product.identifier,
@@ -89,9 +96,23 @@ class RevenueCatService {
         description: product.description,
         priceText: product.priceString,
         packageIdentifier: key,
+        period: _periodOf(package.packageType),
+        price: product.price,
+        currencyCode: product.currencyCode,
+        trialDays: trial?.days,
+        trialMonths: trial?.months,
       );
     }).toList(growable: false);
+
+    return withAnnualSavings(options);
   }
+
+  PurchasePeriod _periodOf(PackageType type) => switch (type) {
+        PackageType.annual => PurchasePeriod.annual,
+        PackageType.monthly => PurchasePeriod.monthly,
+        PackageType.weekly => PurchasePeriod.weekly,
+        _ => PurchasePeriod.other,
+      };
 
   Future<SubscriptionEntitlement> purchase(
     String packageIdentifier,

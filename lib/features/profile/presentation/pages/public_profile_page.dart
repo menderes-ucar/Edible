@@ -164,10 +164,10 @@ class _PublicProfilePageState extends State<PublicProfilePage> {
                       children: [
                         Text(context.l10n.text('personalInfo'), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
                         const SizedBox(height: 12),
-                        if (profile.firstName != null || profile.lastName != null) _PublicInfoRow(icon: Icons.person_outline, label: 'Ad Soyad', value: [profile.firstName, profile.lastName].whereType<String>().where((e) => e.isNotEmpty).join(' ')),
-                        if (profile.age != null) _PublicInfoRow(icon: Icons.cake_outlined, label: 'Yaş', value: '${profile.age}'),
-                        if (profile.hometown != null) _PublicInfoRow(icon: Icons.location_on_outlined, label: 'Nereli', value: profile.hometown!),
-                        if (profile.gender != null) _PublicInfoRow(icon: Icons.wc_outlined, label: 'Cinsiyet', value: _genderLabel(profile.gender!)),
+                        if (profile.firstName != null || profile.lastName != null) _PublicInfoRow(icon: Icons.person_outline, label: context.l10n.text('fullName'), value: [profile.firstName, profile.lastName].whereType<String>().where((e) => e.isNotEmpty).join(' ')),
+                        if (profile.age != null) _PublicInfoRow(icon: Icons.cake_outlined, label: context.l10n.text('age'), value: '${profile.age}'),
+                        if (profile.hometown != null) _PublicInfoRow(icon: Icons.location_on_outlined, label: context.l10n.text('hometownLabel'), value: profile.hometown!),
+                        if (profile.gender != null) _PublicInfoRow(icon: Icons.wc_outlined, label: context.l10n.text('gender'), value: _genderLabel(context, profile.gender!)),
                       ],
                     ),
                   ),
@@ -221,12 +221,12 @@ class _PublicProfile {
   );
 }
 
-String _genderLabel(String value) {
+String _genderLabel(BuildContext context, String value) {
   switch (value) {
-    case 'female': return 'Kadın';
-    case 'male': return 'Erkek';
-    case 'non_binary': return 'Non-binary';
-    case 'prefer_not_to_say': return 'Belirtmek istemiyorum';
+    case 'female': return context.l10n.text('female');
+    case 'male': return context.l10n.text('male');
+    case 'non_binary': return context.l10n.text('nonBinary');
+    case 'prefer_not_to_say': return context.l10n.text('preferNotToSay');
     default: return value;
   }
 }

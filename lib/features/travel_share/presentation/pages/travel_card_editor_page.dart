@@ -10,6 +10,7 @@ import '../../../travel_journal/presentation/providers/travel_memory_provider.da
 import '../../domain/entities/travel_card_style.dart';
 import '../../domain/entities/travel_share_card.dart';
 import '../services/travel_card_share_service.dart';
+import '../services/travel_share_caption.dart';
 import '../widgets/editable_travel_card.dart';
 
 class TravelCardEditorPage extends StatefulWidget {
@@ -131,8 +132,13 @@ class _TravelCardEditorPageState extends State<TravelCardEditorPage> {
         boundary: boundary,
         fileName:
             'edible_${visit.cityName}_${_aspect.name}_${_template.name}',
-        shareText:
-            '${visit.cityName}, ${visit.countryName} • Edible',
+        shareText: TravelShareCaption.withLink(
+          context,
+          context.l10n
+              .text('shareCityCaption')
+              .replaceAll('{city}', visit.cityName)
+              .replaceAll('{country}', visit.countryName),
+        ),
       );
     } catch (error) {
       if (!mounted) {

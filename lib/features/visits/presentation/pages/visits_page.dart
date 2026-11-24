@@ -8,6 +8,8 @@ import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../travel_share/presentation/services/travel_card_share_service.dart';
+import '../../../travel_share/presentation/services/travel_share_caption.dart';
+import '../../../travel_share/presentation/widgets/travel_share_format_sheet.dart';
 import '../../domain/entities/country_visit_badge.dart';
 import '../../domain/entities/travel_dna.dart';
 import '../../domain/entities/passport_milestone.dart';
@@ -65,6 +67,9 @@ class _VisitsPageState extends State<VisitsPage> {
     final dna = context.read<VisitsProvider>().travelDna;
     if (dna == null || !dna.hasData) return;
 
+    final format = await showTravelShareFormatSheet(context);
+    if (format == null || !mounted) return;
+
     final boundary = _dnaShareKey.currentContext?.findRenderObject();
     if (boundary is! RenderRepaintBoundary) return;
 
@@ -72,9 +77,12 @@ class _VisitsPageState extends State<VisitsPage> {
       await const TravelCardShareService().shareBoundary(
         boundary: boundary,
         fileName: 'edible_travel_dna_${dna.profileKey}',
-        shareText:
-            '${context.l10n.text('myTravelDna')} • '
-            '${context.l10n.text(dna.profileTitleKey)}',
+        shareText: TravelShareCaption.withLink(
+          context,
+          '${context.l10n.text('myTravelDna')} • '
+          '${context.l10n.text(dna.profileTitleKey)}',
+        ),
+        format: format,
       );
     } catch (error) {
       if (!mounted) return;
@@ -88,6 +96,9 @@ class _VisitsPageState extends State<VisitsPage> {
     final summary = context.read<VisitsProvider>().yearSummary;
     if (summary == null || !summary.hasTravel) return;
 
+    final format = await showTravelShareFormatSheet(context);
+    if (format == null || !mounted) return;
+
     final boundary = _yearShareKey.currentContext?.findRenderObject();
     if (boundary is! RenderRepaintBoundary) return;
 
@@ -95,9 +106,16 @@ class _VisitsPageState extends State<VisitsPage> {
       await const TravelCardShareService().shareBoundary(
         boundary: boundary,
         fileName: 'edible_year_in_travel_${summary.year}',
-        shareText:
-            '${summary.year} • ${summary.countryCount} countries • '
-            '${summary.cityCount} cities • ${summary.travelDayCount} travel days',
+        shareText: TravelShareCaption.withLink(
+          context,
+          context.l10n
+              .text('shareYearCaption')
+              .replaceAll('{year}', '${summary.year}')
+              .replaceAll('{countries}', '${summary.countryCount}')
+              .replaceAll('{cities}', '${summary.cityCount}')
+              .replaceAll('{days}', '${summary.travelDayCount}'),
+        ),
+        format: format,
       );
     } catch (error) {
       if (!mounted) return;

@@ -208,8 +208,10 @@ class ContentImageResolver {
           attribution: 'Catalog image',
           score: 0.35,
         );
+        // Memory only: a catalog fallback must never be written to the
+        // permanent disk cache, otherwise one failed search (offline, timeout)
+        // would block the real image search for this item forever.
         _memoryCache[key] = fallback;
-        await _saveDiskCache(key, fallback);
         return fallback;
       }
 
@@ -239,6 +241,15 @@ class ContentImageResolver {
       'images.unsplash.com/photo-1564501049412-61c2a3083791',
     ];
     if (blocked.any(lower.contains)) return null;
+
+    // The bundled catalog only carries generic stock placeholders from
+    // Unsplash (a handful of photos shared by hundreds of items). Release
+    // policy (GlobalMediaReleasePolicy) does not treat them as landmark
+    // photos, so they are never used as a fallback.
+    if (lower.contains('images.unsplash.com') ||
+        lower.contains('source.unsplash.com')) {
+      return null;
+    }
     return value;
   }
 

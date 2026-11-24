@@ -16,6 +16,8 @@ import '../../../location/domain/usecases/verify_check_in.dart';
 import '../../../../core/services/location_service.dart';
 import '../../../food/domain/entities/food_details.dart';
 import '../../../food/domain/repositories/food_repository.dart';
+import '../../../food/presentation/widgets/dietary_alert_banner.dart';
+import '../../../suggestions/presentation/widgets/report_issue_sheet.dart';
 import '../../../food/presentation/widgets/food_intelligence_section.dart';
 import '../../domain/entities/explore_content.dart';
 import '../../domain/entities/explore_metadata.dart';
@@ -401,6 +403,10 @@ class _ContentDetailPageState extends State<ContentDetailPage> {
                             userLongitude: location.longitude!,
                             contentLatitude: content.latitude,
                             contentLongitude: content.longitude,
+                            maxDistanceMeters: VerifyCheckIn.radiusFor(
+                              hasExactCoordinates:
+                                  content.metadata.hasExactCoordinates,
+                            ),
                           );
 
                           if (!context.mounted) return;
@@ -554,10 +560,17 @@ class _ContentDetailPageState extends State<ContentDetailPage> {
                       (_descriptionSourceUrl?.trim().isNotEmpty == true)) ...[
                     const SizedBox(height: 8),
                     Text(
-                      '${_descriptionSource!} • Kaynak: ${_descriptionSourceUrl!}',
+                      '${_descriptionSource!} • ${context.l10n.text('descriptionSource')}: ${_descriptionSourceUrl!}',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: Colors.white70,
                           ),
+                    ),
+                  ],
+                  if (_isFoodContent(content)) ...[
+                    const SizedBox(height: 24),
+                    DietaryAlertBanner(
+                      details: _foodDetails,
+                      countryCode: content.countryCode,
                     ),
                   ],
                   if (_foodDetails != null && !_foodDetails!.isEmpty) ...[
@@ -582,6 +595,20 @@ class _ContentDetailPageState extends State<ContentDetailPage> {
                           .toList(),
                     ),
                   ],
+                  const SizedBox(height: 24),
+                  Align(
+                    alignment: AlignmentDirectional.centerStart,
+                    child: TextButton.icon(
+                      style: TextButton.styleFrom(foregroundColor: Colors.white70),
+                      onPressed: () => showReportIssueSheet(
+                        context,
+                        contentId: content.id,
+                        contentTitle: content.title,
+                      ),
+                      icon: const Icon(Icons.flag_outlined, size: 18),
+                      label: Text(context.l10n.text('reportIssue')),
+                    ),
+                  ),
                 ],
               ),
             ),

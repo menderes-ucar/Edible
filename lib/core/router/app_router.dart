@@ -10,7 +10,12 @@ import '../../features/explore/presentation/pages/city_detail_page.dart';
 import '../../features/explore/presentation/pages/city_map_page.dart';
 import '../../features/explore/presentation/pages/content_detail_page.dart';
 import '../../features/explore/presentation/pages/country_detail_page.dart';
+import '../../features/currency/presentation/pages/currency_converter_page.dart';
 import '../../features/favorites/presentation/pages/favorites_page.dart';
+import '../../features/referral/presentation/pages/referral_page.dart';
+import '../../features/suggestions/presentation/pages/suggest_place_page.dart';
+import '../../features/food/presentation/pages/dietary_profile_page.dart';
+import '../../features/food/presentation/pages/waiter_card_page.dart';
 import '../../features/community/presentation/pages/community_page.dart';
 import '../../features/messaging/presentation/pages/messages_page.dart';
 import '../../features/notifications/presentation/pages/notifications_page.dart';
@@ -146,6 +151,32 @@ abstract final class AppRouter {
         GoRoute(
           path: AppRoutes.passport,
           builder: (_, __) => const PassportPage(),
+        ),
+        GoRoute(
+          path: AppRoutes.dietaryProfile,
+          builder: (_, __) => const DietaryProfilePage(),
+        ),
+        GoRoute(
+          path: AppRoutes.suggestPlace,
+          builder: (_, state) => SuggestPlacePage(
+            city: state.uri.queryParameters['city'],
+          ),
+        ),
+        GoRoute(
+          path: AppRoutes.invite,
+          builder: (_, __) => const ReferralPage(),
+        ),
+        GoRoute(
+          path: AppRoutes.currencyConverter,
+          builder: (_, state) => CurrencyConverterPage(
+            countryCode: state.uri.queryParameters['country'],
+          ),
+        ),
+        GoRoute(
+          path: AppRoutes.waiterCard,
+          builder: (_, state) => WaiterCardPage(
+            initialLanguageCode: state.uri.queryParameters['lang'],
+          ),
         ),
         GoRoute(
           path: AppRoutes.visitedWorldMap,

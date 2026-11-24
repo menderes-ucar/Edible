@@ -325,6 +325,26 @@ class _CityDetailPageState extends State<CityDetailPage> {
               context.push(AppRoutes.tripPlanner);
             },
           ),
+          const SizedBox(height: 8),
+          _CityToolCard(
+            icon: Icons.currency_exchange_rounded,
+            title: context.l10n.text('currencyConverter'),
+            subtitle: context.l10n.text('currencyToolSubtitle'),
+            trailing: const Icon(Icons.chevron_right_rounded),
+            onTap: () => context.push(
+              AppRoutes.currencyConverterFor(countryCode: widget.countryCode),
+            ),
+          ),
+          const SizedBox(height: 8),
+          _CityToolCard(
+            icon: Icons.add_location_alt_rounded,
+            title: context.l10n.text('suggestPlaceTitle'),
+            subtitle: context.l10n.text('suggestPlaceSubtitle'),
+            trailing: const Icon(Icons.chevron_right_rounded),
+            onTap: () => context.push(
+              AppRoutes.suggestPlaceFor(city: widget.cityName),
+            ),
+          ),
           const SizedBox(height: 20),
           Row(
             children: [

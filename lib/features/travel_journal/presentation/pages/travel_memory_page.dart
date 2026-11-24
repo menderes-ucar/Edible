@@ -8,6 +8,8 @@ import '../../../../core/error/app_error_presenter.dart';
 
 import '../../../travel_share/domain/entities/travel_share_card.dart';
 import '../../../travel_share/presentation/services/travel_card_share_service.dart';
+import '../../../travel_share/presentation/services/travel_share_caption.dart';
+import '../../../travel_share/presentation/widgets/travel_share_format_sheet.dart';
 import '../../../travel_share/presentation/widgets/travel_share_card_widget.dart';
 import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/router/app_routes.dart';
@@ -212,6 +214,11 @@ class _TravelMemoryPageState extends State<TravelMemoryPage> {
       return;
     }
 
+    final format = await showTravelShareFormatSheet(context);
+    if (format == null || !mounted) {
+      return;
+    }
+
     final boundary = _shareCardKey.currentContext?.findRenderObject();
     if (boundary is! RenderRepaintBoundary) {
       return;
@@ -221,8 +228,11 @@ class _TravelMemoryPageState extends State<TravelMemoryPage> {
       await const TravelCardShareService().shareBoundary(
         boundary: boundary,
         fileName: 'edible_${visit.cityName}_${visit.id}',
-        shareText:
-            '${_titleController.text.trim()} • ${visit.cityName}, ${visit.countryName}',
+        shareText: TravelShareCaption.withLink(
+          context,
+          '${_titleController.text.trim()} • ${visit.cityName}, ${visit.countryName}',
+        ),
+        format: format,
       );
     } catch (error) {
       if (!mounted) {

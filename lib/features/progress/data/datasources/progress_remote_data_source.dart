@@ -2,6 +2,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/services/supabase_service.dart';
 import '../../domain/entities/content_progress.dart';
+import '../../domain/entities/discovery_event.dart';
 
 class ProgressPersistenceException implements Exception {
   const ProgressPersistenceException(this.code);
@@ -42,6 +43,31 @@ class ProgressRemoteDataSource {
         .whereType<String>()
         .where((id) => id.isNotEmpty)
         .toSet();
+  }
+
+  /// One event per discovery: the earliest time it was marked visited or tried.
+  Future<List<DiscoveryEvent>> getDiscoveryEvents() async {
+    final rows = await _client
+        .from('content_progress')
+        .select('content_id, created_at')
+        .eq('user_id', _userId)
+        .order('created_at', ascending: false)
+        .limit(2000);
+
+    final firstSeen = <String, DateTime>{};
+    for (final raw in rows as List<dynamic>) {
+      final row = Map<String, dynamic>.from(raw as Map);
+      final id = row['content_id']?.toString();
+      final time = DateTime.tryParse(row['created_at']?.toString() ?? '');
+      if (id == null || id.isEmpty || time == null) continue;
+      final existing = firstSeen[id];
+      if (existing == null || time.isBefore(existing)) firstSeen[id] = time;
+    }
+
+    return [
+      for (final entry in firstSeen.entries)
+        DiscoveryEvent(contentId: entry.key, createdAt: entry.value),
+    ];
   }
 
   Future<void> setProgress({
