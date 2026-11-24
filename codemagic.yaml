@@ -112,7 +112,6 @@ workflows:
           echo "========================================"
 
           flutter build ipa \
-            --release \
             --build-name="$IOS_VERSION" \
             --build-number="$BUILD_NUMBER" \
             --dart-define=SUPABASE_URL="$SUPABASE_URL" \
